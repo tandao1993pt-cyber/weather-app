@@ -23,7 +23,7 @@ body {
     overflow: hidden;
 }
 
-/* Header hiện đại - Dời tên app sang góc trái cạnh menu */
+/* Header */
 .header {
     height: 60px;
     padding: 0 16px;
@@ -76,7 +76,7 @@ body {
     letter-spacing: 0.3px;
 }
 
-/* Menu 3 gạch tối giản */
+/* Menu */
 .drawer-overlay {
     position: fixed;
     top: 0;
@@ -116,7 +116,6 @@ body {
     transform: translateX(280px);
 }
 
-/* Biểu tượng hình tròn có dấu chấm than duy nhất */
 .circle-icon {
     width: 60px;
     height: 60px;
@@ -247,7 +246,7 @@ body {
     transform: scale(0.95);
 }
 
-/* Khung nhập liệu nổi */
+/* Khung Nhập Liệu */
 .input-wrapper {
     position: fixed;
     bottom: 0;
@@ -350,14 +349,12 @@ textarea::placeholder { color: #64748b; }
 
 <body>
 
-<!-- Drawer Menu (Chỉ chứa hình tròn dấu chấm than) -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()">
     <div class="drawer" onclick="event.stopPropagation()">
         <div class="circle-icon">!</div>
     </div>
 </div>
 
-<!-- Header (Tên App dời về bên trái cạnh Menu) -->
 <header class="header">
     <div class="header-left">
         <button class="header-btn" onclick="toggleMenu()">☰</button>
@@ -368,7 +365,6 @@ textarea::placeholder { color: #64748b; }
     <button class="header-btn" onclick="newChat()">＋</button>
 </header>
 
-<!-- Khung Chat chính -->
 <main class="chat" id="chat">
     <div class="message assistant">
         <div class="ai-avatar">嵐</div>
@@ -381,7 +377,6 @@ textarea::placeholder { color: #64748b; }
     </div>
 </main>
 
-<!-- Khung Nhập Liệu -->
 <div class="input-wrapper">
     <div class="quick-prompts">
         <div class="prompt-chip" onclick="sendQuickPrompt('Thời tiết Phan Thiết hiện tại sao rồi?')">🌧 Thời tiết hiện tại</div>
@@ -396,22 +391,21 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const API_KEY = "AQ.Ab8RN6JaBo7SDpEQMyRGqmspzUF7wA9VYOSXc1nVaXfZyBeajA";
+const API_KEY = "AQ.Ab8RN6J_c_JYGHiwrUbiqcf0w-MavwSL2i3zyuGNYnDBGcofOA";
 const MODEL = "gemini-1.5-flash";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const micBtn = document.getElementById("micBtn");
-let currentAudio = null;
 
 function toggleMenu() {
     document.getElementById("drawerOverlay").classList.toggle("active");
 }
 
-async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
+async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
             const response = await fetch(url, {
@@ -425,15 +419,14 @@ async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
             const data = await response.json();
             if (response.ok) return { ok: true, data };
             
-            const errMsg = data.error?.message || "";
-            if ((errMsg.includes("high demand") || response.status === 429) && attempt < maxRetries) {
-                await new Promise(res => setTimeout(res, delayMs * (attempt + 1)));
+            if (attempt < maxRetries && response.status === 429) {
+                await new Promise(res => setTimeout(res, delayMs));
                 continue;
             }
-            return { ok: false, data };
+            return { ok: false, data, status: response.status };
         } catch (err) {
             if (attempt === maxRetries) throw err;
-            await new Promise(res => setTimeout(res, delayMs * (attempt + 1)));
+            await new Promise(res => setTimeout(res, delayMs));
         }
     }
 }
@@ -450,7 +443,7 @@ async function sendMessage() {
 
     try {
         const payload = {
-            system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
             contents: [{ parts: [{ text: text }] }]
         };
 
@@ -458,7 +451,8 @@ async function sendMessage() {
         loading.remove();
 
         if (!result.ok) {
-            addAIMessage("Có lỗi kết nối. Bạn bấm gửi lại giúp tôi nhé.");
+            const errorMsg = result.data?.error?.message || "Lỗi phản hồi từ Google";
+            addAIMessage(`Không thể kết nối. Chi tiết lỗi: ${errorMsg}`);
             return;
         }
 
@@ -469,7 +463,7 @@ async function sendMessage() {
 
     } catch (error) {
         loading.remove();
-        addAIMessage("Không có kết nối mạng. Bạn kiểm tra lại mạng nhé.");
+        addAIMessage("Lỗi mạng internet. Bạn kiểm tra lại kết nối Wifi/4G nhé.");
     }
 }
 
@@ -520,50 +514,28 @@ function addAIMessage(text) {
     return message;
 }
 
-async function speakText(text, button) {
+function speakText(text, button) {
     if (!text) return;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        
+        const cleanText = text.replace(/[*#_~`]/g, '').trim();
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'vi-VN';
+        
+        if (button) button.innerHTML = "🔊 Đang đọc...";
 
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-
-    const cleanText = text.replace(/[*#_~`]/g, '').trim().substring(0, 150);
-    if (button) button.innerHTML = "⏳ Đang tải...";
-
-    try {
-        const res = await fetch("https://api.soundoftext.com/sounds", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                engine: "Google",
-                data: { text: cleanText, voice: "vi-VN" }
-            })
-        });
-
-        const data = await res.json();
-
-        if (data.success && data.id) {
-            const audioUrl = `https://files.soundoftext.com/${data.id}.mp3`;
-            currentAudio = new Audio(audioUrl);
-
-            if (button) button.innerHTML = "🔊 Đang đọc...";
-
-            currentAudio.play().catch(() => {
-                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
-            });
-
-            currentAudio.onended = () => {
-                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
-            };
-            currentAudio.onerror = () => {
-                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
-            };
-        } else {
+        utterance.onend = () => {
             if (button) button.innerHTML = "🔊 Bấm để nghe lại";
-        }
-    } catch (e) {
-        if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+        };
+        utterance.onerror = () => {
+            if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+        };
+
+        window.speechSynthesis.speak(utterance);
+    } else {
+        if (button) button.innerHTML = "Trình duyệt không hỗ trợ đọc";
     }
 }
 
@@ -631,10 +603,7 @@ function autoResize() {
 }
 
 function newChat() {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     chat.innerHTML = `
         <div class="message assistant">
             <div class="ai-avatar">嵐</div>
