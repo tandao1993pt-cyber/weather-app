@@ -217,7 +217,6 @@ body {
     border-radius: 24px 24px 24px 6px;
 }
 
-/* Chữ người dùng mềm mại, bo tròn tự nhiên */
 .user .content-bubble {
     background: linear-gradient(135deg, #0284c7, #0ea5e9);
     color: #ffffff;
@@ -399,7 +398,7 @@ textarea::placeholder { color: #64748b; }
 <script>
 const API_KEY = "AQ.Ab8RN6JaBo7SDpEQMyRGqmspzUF7wA9VYOSXc1nVaXfZyBeajA";
 const MODEL = "gemini-1.5-flash";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
@@ -417,7 +416,10 @@ async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
         try {
             const response = await fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": API_KEY
+                },
                 body: JSON.stringify(payload)
             });
             const data = await response.json();
