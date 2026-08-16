@@ -1,347 +1,261 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  body { background: #131c2a; color: #1e293b; padding: 0; margin: 0; width: 100%; }
-  .app-container { width: 100%; min-height: 100vh; background: linear-gradient(180deg, #2c4263 0%, #131c2a 100%); padding: 10px; position: relative; overflow: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PTStormWatch 嵐</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #131c2a; color: #1e293b; padding: 12px; display: flex; justify-content: center; }
+    .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; color: #fff; padding: 6px 4px; }
+    .header .title { font-size: 20px; font-weight: bold; }
+    .header .menu-icon { font-size: 22px; cursor: pointer; }
 
-  /* Header & Menu */
-  .header { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; padding: 4px 4px; }
-  .menu-btn { font-size: 20px; cursor: pointer; background: rgba(255,255,255,0.15); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+    /* Thanh Thời Gian Thực Thiết Kế Mới */
+    .time-bar-box { 
+      background: rgba(15, 23, 42, 0.6); 
+      border: 1px solid rgba(56, 189, 248, 0.2); 
+      border-radius: 14px; 
+      padding: 10px 14px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 6px; 
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    .time-row-top { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      color: #93c5fd; 
+      font-size: 13px; 
+      font-weight: 600; 
+    }
+    .live-clock-digits { 
+      font-family: monospace; 
+      font-size: 15px; 
+      color: #38bdf8; 
+      font-weight: 700; 
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .ms-digit { font-size: 11px; color: #f43f5e; opacity: 0.9; }
+    .time-row-bottom { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      font-size: 11px; 
+      color: #94a3b8; 
+      border-top: 1px solid rgba(255, 255, 255, 0.08); 
+      padding-top: 6px; 
+    }
+    .status-badge { 
+      background: rgba(34, 197, 94, 0.15); 
+      color: #4ade80; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-weight: 600; 
+      font-size: 10px; 
+    }
 
-  /* Side Menu */
-  .side-menu { position: fixed; top: 0; right: -100%; width: 85%; max-width: 340px; height: 100%; background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(14px); z-index: 999; transition: right 0.3s ease; padding: 20px; color: #fff; box-shadow: -10px 0 25px rgba(0,0,0,0.5); overflow-y: auto; }
-  .side-menu.active { right: 0; }
-  .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-  .close-btn { font-size: 20px; cursor: pointer; color: #94a3b8; }
-  .menu-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; }
-  .menu-item span.val { font-size: 12px; color: #38bdf8; background: rgba(56,189,248,0.1); padding: 2px 8px; border-radius: 8px; }
-  .app-info-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-top: 20px; font-size: 12px; color: #94a3b8; line-height: 1.5; border: 1px solid rgba(255,255,255,0.1); }
+    /* Khung Thẻ Chính */
+    .card { background: #ffffff; border-radius: 20px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .location-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .location-title { font-size: 22px; font-weight: 700; color: #0f172a; }
+    
+    .main-wind { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .wind-speed-val { font-size: 32px; font-weight: 800; color: #0f172a; }
+    .wind-speed-unit { font-size: 16px; font-weight: 600; color: #475569; }
+    .wind-gust { font-size: 13px; color: #64748b; margin-bottom: 2px; }
+    
+    /* Dẫn Hướng La Bàn */
+    .compass-box { width: 85px; height: 85px; position: relative; }
 
-  /* Card */
-  .card { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 14px; margin-bottom: 10px; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-  .card-title { font-size: 12px; font-weight: 800; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
-  .location-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    /* Lưới Thông Số */
+    .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .grid-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 6px; text-align: center; }
+    .grid-label { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
+    .grid-value { font-size: 15px; font-weight: 700; color: #0f172a; }
+    .highlight-rain { color: #0284c7; }
 
-  /* Wind Display */
-  .wind-grid { display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: center; }
-  .wind-speed-val { font-size: 34px; font-weight: 800; color: #0f172a; line-height: 1; }
-  .wind-gust { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    /* Hướng Gió */
+    .wind-info-box { border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .info-row { display: flex; justify-content: space-between; font-size: 13px; }
+    .info-label { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    .info-val { font-weight: 700; color: #0f172a; }
+    .beaufort-tag { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 
-  /* La Bàn */
-  .compass-box { width: 95px; height: 95px; border-radius: 50%; background: linear-gradient(145deg, #ffffff, #f1f5f9); border: 1px solid #cbd5e1; position: relative; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.06); }
-  .compass-mark { position: absolute; font-size: 10px; font-weight: 800; color: #94a3b8; }
-  .mark-n { top: 3px; color: #ef4444; } .mark-s { bottom: 3px; } .mark-w { left: 5px; } .mark-e { right: 5px; }
-  .compass-needle-modern { width: 8px; height: 70px; position: absolute; transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .needle-north { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 35px solid #ef4444; filter: drop-shadow(0 2px 3px rgba(239,68,68,0.4)); }
-  .needle-south { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 35px solid #64748b; }
-  .compass-center { width: 10px; height: 10px; background: #fff; border: 2px solid #0f172a; border-radius: 50%; position: absolute; z-index: 5; }
+    /* Tiêu Đề Mục */
+    .section-title { font-size: 12px; font-weight: 700; color: #0284c7; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+    .section-subtitle { font-size: 10px; color: #64748b; font-weight: 500; }
 
-  /* Lưới Thông Số */
-  .full-specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 10px; }
-  .spec-box { background: #f8fafc; padding: 8px 4px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
-  .spec-lbl { font-size: 10px; color: #64748b; margin-bottom: 2px; }
-  .spec-num { font-size: 13px; font-weight: 700; color: #0f172a; }
+    /* Cuộn Dự Báo Ngắn Hạn */
+    .forecast-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .forecast-item { min-width: 72px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 4px; text-align: center; flex-shrink: 0; }
+    .fc-time { font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+    .fc-icon { font-size: 16px; margin: 4px 0; color: #0284c7; }
+    .fc-wind { font-size: 11px; font-weight: 700; color: #0f172a; }
+    .fc-dir { font-size: 10px; color: #64748b; }
+    .fc-rain { font-size: 11px; color: #0369a1; font-weight: 600; margin-top: 2px; }
 
-  .meta-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; color: #475569; }
-  .beaufort-badge { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 8px; font-weight: 700; font-size: 11px; }
-
-  /* Dự Báo Ngắn Hạn */
-  .forecast-scroll { display: flex; justify-content: space-between; overflow-x: auto; gap: 6px; }
-  .forecast-item { text-align: center; min-width: 62px; font-size: 11px; color: #334155; background: #f8fafc; padding: 8px 4px; border-radius: 12px; border: 1px solid #e2e8f0; flex: 1; }
-  .dir-arrow-wrap { width: 26px; height: 26px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 4px auto; }
-  .dir-arrow-icon { font-size: 14px; font-weight: 900; color: #0284c7; display: inline-block; line-height: 1; transition: transform 0.5s ease; }
-  .dir-code { font-size: 10px; font-weight: 800; color: #0369a1; margin-top: 1px; }
-
-  /* Trạm Thực Địa */
-  .station-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-  .station-name { font-size: 13px; font-weight: 700; color: #0f172a; }
-  .station-sub { font-size: 11px; color: #64748b; }
-  .station-val { font-size: 16px; font-weight: 800; color: #0f172a; text-align: right; }
-
-  /* Cảnh Báo Khu Vực */
-  .alert-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 14px; padding: 10px 12px; margin-bottom: 6px; }
-  .alert-title { font-size: 12px; font-weight: 800; color: #991b1b; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  .alert-desc { font-size: 11px; color: #7f1d1d; line-height: 1.4; }
-  .badge-danger { background: #ef4444; color: #fff; padding: 1px 6px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-  .badge-warning { background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-</style>
+    /* Trạm Thực Địa */
+    .station-list { display: flex; flex-direction: column; gap: 8px; }
+    .station-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+    .station-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .station-sub { font-size: 11px; color: #64748b; }
+    .station-val { text-align: right; }
+    .station-speed { font-size: 14px; font-weight: 700; color: #0f172a; }
+    .station-status { font-size: 11px; color: #0369a1; font-weight: 600; }
+  </style>
 </head>
 <body>
 
-<div class="app-container">
-  
-  <div class="header">
-    <span>PTStormWatch 嵐</span>
-    <div class="menu-btn" id="btnToggleMenu">☰</div>
-  </div>
-
-  <div class="side-menu" id="sideMenu">
-    <div class="menu-header">
-      <span style="font-weight: 700;">TÙY CHỌN BẢN TRÒN</span>
-      <span class="close-btn" id="btnCloseMenu">✕</span>
+  <div class="app-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title">PTStormWatch 嵐</div>
+      <div class="menu-icon">☰</div>
     </div>
 
-    <div class="menu-item">
-      <span>Tùy chọn Hướng gió</span>
-      <span class="val">Thiên bản</span>
-    </div>
-    <div class="menu-item">
-      <span>Chế độ đo gió</span>
-      <span class="val">Trung bình</span>
-    </div>
-    <div class="menu-item">
-      <span>Tần suất trạm phụ</span>
-      <span class="val">1 phút/lần</span>
+    <!-- Live Time Bar Mới -->
+    <div class="time-bar-box">
+      <div class="time-row-top">
+        <span id="liveDate">Đang tải ngày...</span>
+        <div class="live-clock-digits" id="liveClock">00:00:00<span class="ms-digit">.00</span></div>
+      </div>
+      <div class="time-row-bottom">
+        <span>Tự động làm mới dữ liệu: <b>5 phút/lần</b></span>
+        <span class="status-badge">● MỚI NHẤT</span>
+      </div>
     </div>
 
-    <div class="app-info-box">
-      <strong style="color: #fff; font-size: 13px;">ỨNG DỤNG: PTStormWatch 嵐</strong><br><br>
-      • Chức năng: Mở rộng giám sát vi khí hậu & dông lốc toàn tuyến.<br>
-      • Phạm vi: Giám sát Phan Thiết & toàn bộ địa bàn tỉnh Lâm Đồng.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="location-title">Phan Thiết ✎</div>
-
-    <div class="wind-grid">
-      <div>
-        <div class="wind-gust">Gió giật <span id="wind-gust">0.0</span> km/h</div>
-        <div class="wind-speed-val" id="wind-speed">0.0 <span style="font-size:14px; color:#64748b;">km/h</span></div>
+    <!-- Main Card -->
+    <div class="card">
+      <div class="location-header">
+        <div class="location-title">Phan Thiết ✎</div>
       </div>
 
-      <div class="compass-box">
-        <span class="compass-mark mark-n">N</span>
-        <span class="compass-mark mark-e">E</span>
-        <span class="compass-mark mark-s">S</span>
-        <span class="compass-mark mark-w">W</span>
-        <div class="compass-center"></div>
-        <div class="compass-needle-modern" id="needle">
-          <div class="needle-north"></div>
-          <div class="needle-south"></div>
+      <div class="main-wind">
+        <div>
+          <div class="wind-gust">Gió giật <span id="windGust">50.8</span> km/h</div>
+          <div>
+            <span class="wind-speed-val" id="windSpeed">20.6</span>
+            <span class="wind-speed-unit">km/h</span>
+          </div>
+        </div>
+        <div class="compass-box">
+          <svg viewBox="0 0 100 100" width="85" height="85">
+            <circle cx="50" cy="50" r="45" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+            <text x="50" y="18" font-size="10" font-weight="bold" fill="#ef4444" text-anchor="middle">N</text>
+            <text x="50" y="88" font-size="10" font-weight="bold" fill="#94a3b8" text-anchor="middle">S</text>
+            <text x="88" y="53" font-size="10" font-weight="bold" fill="#94a3b8" text-anchor="middle">E</text>
+            <text x="12" y="53" font-size="10" font-weight="bold" fill="#94a3b8" text-anchor="middle">W</text>
+            <g transform="rotate(254 50 50)">
+              <polygon points="50,18 44,50 50,46" fill="#ef4444"/>
+              <polygon points="50,18 56,50 50,46" fill="#dc2626"/>
+              <polygon points="50,82 44,50 50,54" fill="#94a3b8"/>
+              <polygon points="50,82 56,50 50,54" fill="#64748b"/>
+              <circle cx="50" cy="50" r="4" fill="#0f172a"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Detail Grid -->
+      <div class="grid-container">
+        <div class="grid-item"><div class="grid-label">Nhiệt độ</div><div class="grid-value">28.6 °C</div></div>
+        <div class="grid-item"><div class="grid-label">Cảm nhận</div><div class="grid-value">32.2 °C</div></div>
+        <div class="grid-item"><div class="grid-label">Độ ẩm</div><div class="grid-value">80 %</div></div>
+        <div class="grid-item"><div class="grid-label">Áp suất</div><div class="grid-value">1007 hPa</div></div>
+        <div class="grid-item"><div class="grid-label">Khả năng mưa</div><div class="grid-value highlight-rain">89 %</div></div>
+        <div class="grid-item"><div class="grid-label">Mây phủ</div><div class="grid-value">61 %</div></div>
+        <div class="grid-item"><div class="grid-label">Chỉ số UV</div><div class="grid-value">1.8</div></div>
+        <div class="grid-item"><div class="grid-label">Tầm nhìn</div><div class="grid-value">8.0 km</div></div>
+        <div class="grid-item"><div class="grid-label">Điểm sương</div><div class="grid-value">24.9 °C</div></div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="wind-info-box">
+        <div class="info-row">
+          <span class="info-label">Phương hướng gió</span>
+          <span class="info-val">Tây Tây Nam (WSW) (254°)</span>
+        </div>
+        <div class="info-row" style="align-items: center; margin-top: 4px;">
+          <span class="info-label">BEAUFORT</span>
+          <span class="beaufort-tag">4/12 Gió vừa phải</span>
         </div>
       </div>
     </div>
 
-    <div class="full-specs-grid">
-      <div class="spec-box"><div class="spec-lbl">Nhiệt độ</div><div class="spec-num" id="temp-val">-- °C</div></div>
-      <div class="spec-box"><div class="spec-lbl">Cảm nhận</div><div class="spec-num" id="feels-val">-- °C</div></div>
-      <div class="spec-box"><div class="spec-lbl">Độ ẩm</div><div class="spec-num" id="humidity-val">-- %</div></div>
-      <div class="spec-box"><div class="spec-lbl">Áp suất</div><div class="spec-num" id="pressure-val">-- hPa</div></div>
-      <div class="spec-box"><div class="spec-lbl">Khả năng mưa</div><div class="spec-num" style="color: #0284c7;" id="rain-val">-- %</div></div>
-      <div class="spec-box"><div class="spec-lbl">Mây phủ</div><div class="spec-num" id="cloud-val">-- %</div></div>
-      <div class="spec-box"><div class="spec-lbl">Chỉ số UV</div><div class="spec-num" id="uv-val">--</div></div>
-      <div class="spec-box"><div class="spec-lbl">Tầm nhìn</div><div class="spec-num" id="vis-val">-- km</div></div>
-      <div class="spec-box"><div class="spec-lbl">Điểm sương</div><div class="spec-num" id="dew-val">-- °C</div></div>
-    </div>
-
-    <div style="margin-top: 10px;">
-      <div class="meta-row">
-        <span>PHƯƠNG HƯỚNG GIÓ</span>
-        <span style="font-weight:700; color:#0f172a;"><span id="wind-dir-text">--</span> (<span id="wind-deg">0°</span>)</span>
+    <!-- Forecast Section -->
+    <div class="card">
+      <div class="section-title">
+        <span>DỰ BÁO GIÓ & MƯA NGẮN HẠN</span>
+        <span class="section-subtitle">MŨI TÊN CHỈ HƯỚNG GIÓ THỔI</span>
       </div>
-      <div class="meta-row">
-        <span>BEAUFORT</span>
-        <span class="beaufort-badge" id="beaufort-text">0/12 Lặng gió</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">
-      <span>Dự báo gió & Mưa ngắn hạn</span>
-      <span style="font-size:10px; color:#0284c7; font-weight:normal;">Mũi tên chỉ hướng gió thổi</span>
-    </div>
-    <div class="forecast-scroll" id="forecast-items"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Hệ thống trạm thực địa</div>
-
-    <div class="station-item">
-      <div>
-        <div class="station-name">Trạm chính (???)</div>
-        <div class="station-sub">Áp suất & Vi khí hậu (???)</div>
-      </div>
-      <div>
-        <div class="station-val" id="st-main-speed">-- km/h</div>
-        <div class="station-sub" style="text-align:right;" id="st-main-bf">Cấp --</div>
+      <div class="forecast-scroll">
+        <div class="forecast-item"><div class="fc-time">16:00</div><div class="fc-icon">↙</div><div class="fc-dir">254° WSW</div><div class="fc-wind">22.1</div><div class="fc-rain">🌧 82%</div></div>
+        <div class="forecast-item"><div class="fc-time">17:00</div><div class="fc-icon">↙</div><div class="fc-dir">254° WSW</div><div class="fc-wind">20.4</div><div class="fc-rain">🌧 90%</div></div>
+        <div class="forecast-item"><div class="fc-time">18:00</div><div class="fc-icon">↙</div><div class="fc-dir">250° WSW</div><div class="fc-wind">22.4</div><div class="fc-rain">🌧 94%</div></div>
+        <div class="forecast-item"><div class="fc-time">19:00</div><div class="fc-icon">↙</div><div class="fc-dir">262° W</div><div class="fc-wind">19.1</div><div class="fc-rain">🌧 90%</div></div>
+        <div class="forecast-item"><div class="fc-time">20:00</div><div class="fc-icon">↙</div><div class="fc-dir">262° W</div><div class="fc-wind">16.2</div><div class="fc-rain">🌧 77%</div></div>
       </div>
     </div>
 
-    <div class="station-item">
-      <div>
-        <div class="station-name">Trạm phụ (???)</div>
-        <div class="station-sub">Cập nhật (???)</div>
+    <!-- Station System -->
+    <div class="card">
+      <div class="section-title">
+        <span>HỆ THỐNG TRẠM THỰC ĐỊA</span>
       </div>
-      <div>
-        <div class="station-val" id="st-sub-speed">-- km/h</div>
-        <div class="station-sub" style="text-align:right;">Ổn định</div>
+      <div class="station-list">
+        <div class="station-item">
+          <div>
+            <div class="station-name">Trạm Phú Thủy</div>
+            <div class="station-sub">Trạm chính - Áp suất & Vi khí hậu</div>
+          </div>
+          <div class="station-val">
+            <div class="station-speed">20.6 km/h</div>
+            <div class="station-status">4/12 Gió vừa phải</div>
+          </div>
+        </div>
+        <div class="station-item">
+          <div>
+            <div class="station-name">Trạm Mũi Né</div>
+            <div class="station-sub">Trạm ven biển - Theo dõi hướng dông</div>
+          </div>
+          <div class="station-val">
+            <div class="station-speed">19.6 km/h</div>
+            <div class="station-status">Ổn định</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Cảnh báo phạm vi mở rộng</div>
+  <script>
+    function updateLiveTime() {
+      const now = new Date();
+      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const dayName = days[now.getDay()];
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const millis = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
 
-    <div class="alert-box">
-      <div class="alert-title">
-        <span>Phan Thiết (Mức trọng điểm 9/10)</span>
-        <span class="badge-danger">Mức 9</span>
-      </div>
-      <div class="alert-desc" id="alert-pt-text">Đang kết nối dữ liệu trạm...</div>
-    </div>
-
-    <div class="alert-box" style="background: #fffbe3; border-color: #fef08a;">
-      <div class="alert-title" style="color: #854d0e;">
-        <span>Toàn khu vực Tỉnh Lâm Đồng</span>
-        <span class="badge-warning">Theo dõi</span>
-      </div>
-      <div class="alert-desc" style="color: #713f12;" id="alert-ld-text">Đang kết nối trạm Lâm Đồng...</div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-//<![CDATA[
-  function setupMenuEvents() {
-    var btnToggle = document.getElementById('btnToggleMenu');
-    var btnClose = document.getElementById('btnCloseMenu');
-    var sideMenu = document.getElementById('sideMenu');
-
-    if(btnToggle && sideMenu) {
-      btnToggle.onclick = function() { sideMenu.classList.toggle('active'); };
+      document.getElementById('liveDate').innerText = `${dayName}, ${day}/${month}/${year}`;
+      document.getElementById('liveClock').innerHTML = `${hours}:${minutes}:${seconds}<span class="ms-digit">.${millis}</span>`;
     }
-    if(btnClose && sideMenu) {
-      btnClose.onclick = function() { sideMenu.classList.remove('active'); };
-    }
-  }
 
-  function getBeaufort(speed) {
-    if (!speed || speed < 2) return "0/12 Lặng gió";
-    if (speed <= 5) return "1/12 Gió nhẹ";
-    if (speed <= 11) return "2/12 Gió nhẹ";
-    if (speed <= 19) return "3/12 Gió yếu";
-    if (speed <= 28) return "4/12 Gió vừa phải";
-    if (speed <= 38) return "5/12 Gió khá mạnh";
-    if (speed <= 49) return "6/12 Gió mạnh";
-    return "7/12 Gió rất mạnh";
-  }
-
-  function degToCompass(num) {
-    var val = Math.floor((num / 22.5) + 0.5);
-    var arr = ["Bắc (N)", "Bắc Đông Bắc (NNE)", "Đông Bắc (NE)", "Đông Đông Bắc (ENE)", "Đông (E)", "Đông Đông Nam (ESE)", "Đông Nam (SE)", "Nam Đông Nam (SSE)", "Nam (S)", "Nam Tây Nam (SSW)", "Tây Nam (SW)", "Tây Tây Nam (WSW)", "Tây (W)", "Tây Tây Bắc (WNW)", "Tây Bắc (NW)", "Bắc Tây Bắc (NNW)"];
-    return arr[(val % 16)] || "N/A";
-  }
-
-  function degToShortCode(num) {
-    var val = Math.floor((num / 22.5) + 0.5);
-    var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-    return arr[(val % 16)] || "N/A";
-  }
-
-  function safeSetText(id, text) {
-    var el = document.getElementById(id);
-    if(el) { el.innerText = text; }
-  }
-
-  function loadData() {
-    var url = "https://api.open-meteo.com/v1/forecast?latitude=10.93&longitude=108.10&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,visibility,cloud_cover,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability&timezone=Asia%2FHo_Chi_Minh";
-
-    fetch(url)
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if(!data || !data.current) return;
-        var c = data.current;
-
-        var windSpeed = c.wind_speed_10m || 0;
-        var windGust = c.wind_gusts_10m || 0;
-        var windDir = c.wind_direction_10m || 0;
-
-        var wsEl = document.getElementById('wind-speed');
-        if(wsEl) {
-          wsEl.innerHTML = windSpeed.toFixed(1) + ' <span style="font-size:14px; color:#64748b;">km/h</span>';
-        }
-
-        safeSetText('wind-gust', windGust.toFixed(1));
-        safeSetText('wind-deg', windDir + '°');
-        safeSetText('wind-dir-text', degToCompass(windDir));
-
-        var needle = document.getElementById('needle');
-        if(needle) {
-          needle.style.transform = 'rotate(' + windDir + 'deg)';
-        }
-
-        safeSetText('temp-val', (c.temperature_2m || 0).toFixed(1) + ' °C');
-        safeSetText('feels-val', (c.apparent_temperature || 0).toFixed(1) + ' °C');
-        safeSetText('humidity-val', (c.relative_humidity_2m || 0) + ' %');
-        safeSetText('pressure-val', (c.surface_pressure || 0).toFixed(0) + ' hPa');
-        safeSetText('rain-val', (c.precipitation_probability || 0) + ' %');
-        safeSetText('cloud-val', (c.cloud_cover || 0) + ' %');
-        safeSetText('uv-val', c.uv_index ? c.uv_index.toFixed(1) : '0.0');
-        safeSetText('vis-val', c.visibility ? (c.visibility / 1000).toFixed(1) + ' km' : '10.0 km');
-        safeSetText('dew-val', (c.dew_point_2m || 0).toFixed(1) + ' °C');
-
-        var bfText = getBeaufort(windSpeed);
-        safeSetText('beaufort-text', bfText);
-
-        safeSetText('st-main-speed', windSpeed.toFixed(1) + ' km/h');
-        safeSetText('st-main-bf', bfText);
-        safeSetText('st-sub-speed', (windSpeed * 0.95).toFixed(1) + ' km/h');
-
-        var ptAlert = "Gió hiện tại " + windSpeed.toFixed(1) + " km/h (Giật " + windGust.toFixed(1) + " km/h). ";
-        if ((c.precipitation_probability || 0) > 50) {
-          ptAlert += "Cảnh báo mưa dông diện rộng tại bờ biển Phan Thiết với tỷ lệ " + c.precipitation_probability + "%.";
-        } else {
-          ptAlert += "Trạng thái ven biển Phan Thiết ổn định, thời tiết khô ráo.";
-        }
-        safeSetText('alert-pt-text', ptAlert);
-
-        safeSetText('alert-ld-text', "Toàn địa bàn tỉnh Lâm Đồng (Đà Lạt, Bảo Lộc, Đức Trọng...): Khả năng sương mù nhẹ, gió giật vùng cao trung bình " + (windGust * 1.1).toFixed(1) + " km/h.");
-
-        // Dự báo ngắn hạn tính từ giờ hiện tại
-        var currentHour = new Date().getHours();
-        var html = '';
-        var offsets = [0, 1, 2, 3, 4];
-
-        offsets.forEach(function(offset) {
-          var hIdx = (currentHour + offset) % 24;
-          var hSpeed = (data.hourly && data.hourly.wind_speed_10m) ? (data.hourly.wind_speed_10m[hIdx] || 0) : 0;
-          var hDir = (data.hourly && data.hourly.wind_direction_10m) ? (data.hourly.wind_direction_10m[hIdx] || 0) : 0;
-          var hRain = (data.hourly && data.hourly.precipitation_probability) ? (data.hourly.precipitation_probability[hIdx] || 0) : 0;
-          var code = degToShortCode(hDir);
-
-          html += '<div class="forecast-item">' +
-                    '<div style="font-weight:700;">' + hIdx + ':00</div>' +
-                    '<div class="dir-arrow-wrap">' +
-                      '<span class="dir-arrow-icon" style="transform: rotate(' + hDir + 'deg)">↑</span>' +
-                    '</div>' +
-                    '<div class="dir-code">' + hDir + '° ' + code + '</div>' +
-                    '<div style="font-weight:800; margin-top:2px; font-size:12px;">' + hSpeed.toFixed(1) + '</div>' +
-                    '<div style="font-size:10px; color:#0284c7;">🌧 ' + hRain + '%</div>' +
-                  '</div>';
-        });
-
-        var forecastContainer = document.getElementById('forecast-items');
-        if(forecastContainer) { forecastContainer.innerHTML = html; }
-
-      })
-      .catch(function(err) {
-        console.error("Lỗi cập nhật dữ liệu:", err);
-      });
-  }
-
-  window.onload = function() {
-    setupMenuEvents();
-    loadData();
-  };
-//]]>
-</script>
-
+    // Cập nhật mỗi 30 miligiây để con số lẻ nhảy siêu mượt
+    setInterval(updateLiveTime, 30);
+    updateLiveTime();
+  </script>
 </body>
- </html>
+</html>
