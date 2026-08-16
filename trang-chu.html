@@ -1,141 +1,91 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PTStormWatch - Trang Chủ</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { width: 100%; height: 100%; background: #0b0f19; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-        body {
-            background-color: #0b0f19;
-            color: #e2e8f0;
-            padding: 16px;
-            min-height: 100vh;
-        }
+    /* Thanh bảng chào cố định ở trên cùng - Không cản trở bấm nút */
+    .app-header {
+      width: 100%;
+      padding: 14px 16px;
+      background: #0f172a;
+      border-bottom: 2px solid #1e293b;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .greeting-text {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
 
-        .header {
-            margin-bottom: 20px;
-            padding: 16px;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            border: 1px solid #334155;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
+    .brand-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-        .header h1 {
-            font-size: 20px;
-            color: #38bdf8;
-            font-weight: 800;
-        }
+    .app-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+    }
 
-        .header p {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
+    .powered-by {
+      font-size: 11px;
+      color: #64748b;
+      background: #1e293b;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
+    /* Container chứa iframe - Tự động phóng to các phần tử nút bấm */
+    .map-wrapper {
+      width: 100%;
+      height: calc(100vh - 70px);
+      position: relative;
+    }
 
-        .card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 18px 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #f8fafc;
-            transition: all 0.15s ease;
-            position: relative;
-        }
-
-        .card:active {
-            transform: scale(0.96);
-            background: #334155;
-        }
-
-        .card-icon {
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .card-desc {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 4px;
-            text-align: center;
-        }
-
-        .badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-        .badge-ai { background: #8b5cf6; color: #fff; }
-        .badge-live { background: #ef4444; color: #fff; }
-    </style>
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      /* Phóng to toàn bộ giao diện điều khiển bên trong thêm 12% cho dễ chạm */
+      transform: scale(1.12);
+      transform-origin: top left;
+      width: 89.28%; /* Bù lại tỉ lệ scale để không bị tràn viền */
+      height: 89.28%;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>PTStormWatch 嵐</h1>
-        <p>Trung tâm giám sát thời tiết & Trực địa</p>
+  <!-- Bảng chào nằm hẳn ở trên cùng -->
+  <div class="app-header">
+    <div class="greeting-text">Xin chào! / Welcome!</div>
+    <div class="brand-container">
+      <div class="app-title">PTStormWatch 嵐</div>
+      <div class="powered-by">Dữ liệu: Windy</div>
     </div>
+  </div>
 
-    <div class="grid-container">
-        
-        <!-- Ô 1: Trợ lý AI -->
-        <a href="ai.html" class="card">
-            <span class="badge badge-ai">AI</span>
-            <div class="card-icon">🤖</div>
-            <div class="card-title">Trợ Lý AI</div>
-            <div class="card-desc">Hỏi đáp & Phân tích</div>
-        </a>
-
-        <!-- Ô 2: Ra-da Windy -->
-        <a href="rada-windy.html" class="card">
-            <span class="badge badge-live">LIVE</span>
-            <div class="card-icon">🛰️</div>
-            <div class="card-title">Ra-da Windy</div>
-            <div class="card-desc">Bản đồ phóng to</div>
-        </a>
-
-        <!-- Ô 3: Mây Dông (Đã có target="_top" để mở link ngoài) -->
-        <a href="https://ptstormwatch.blogspot.com" target="_top" class="card">
-            <div class="card-icon">🌩️</div>
-            <div class="card-title">Mây Dông</div>
-            <div class="card-desc">Tin tức Blogspot</div>
-        </a>
-
-        <!-- Ô 4: Trang Thời Tiết chính -->
-        <a href="index.html" class="card">
-            <div class="card-icon">🧪</div>
-            <div class="card-title">Trang Thời Tiết</div>
-            <div class="card-desc">Dữ liệu tổng hợp</div>
-        </a>
-
-    </div>
+  <!-- Khung bản đồ đã phóng to nút bấm -->
+  <div class="map-wrapper">
+    <iframe 
+      src="https://embed.windy.com/embed2.html?lat=10.950&lon=108.115&detail=true&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=9&overlay=rain&product=ecmwf&level=surface&menu=&message=true&marker=true&calendar=now&type=map&location=coordinates&detailProduct=ecmwf" 
+      frameborder="0">
+    </iframe>
+  </div>
 
 </body>
 </html>
+ Từ từ tôi quên luôn. Tạo thêm một cái này nữa. Tôi quên mất.
