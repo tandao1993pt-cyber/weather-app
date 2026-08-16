@@ -205,6 +205,7 @@
   </div>
 
   <script>
+    // 1. Đồng hồ đếm thời gian thực
     function updateLiveTime() {
       const now = new Date();
       const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -223,6 +224,12 @@
 
     setInterval(updateLiveTime, 1000);
     updateLiveTime();
+
+    // 2. Tự động tải lại trang mỗi 5 phút (300.000 miligiây)
+    setInterval(function() {
+      location.reload();
+    }, 300000);
   </script>
 </body>
-</html>
+  </html>
+  
