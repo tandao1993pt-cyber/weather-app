@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Đầu trang */
         .header {
             margin-bottom: 20px;
             padding: 16px;
@@ -41,14 +40,12 @@
             margin-top: 4px;
         }
 
-        /* Lưới 2 cột chứa 4 ô */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
-        /* Ô thẻ (Card) */
         .card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -86,7 +83,6 @@
             text-align: center;
         }
 
-        /* Nhãn nhỏ nổi bật */
         .badge {
             position: absolute;
             top: 8px;
@@ -102,16 +98,14 @@
 </head>
 <body>
 
-    <!-- Khung tiêu đề -->
     <div class="header">
         <h1>PTStormWatch 嵐</h1>
         <p>Trung tâm giám sát thời tiết & Trực địa</p>
     </div>
 
-    <!-- Danh sách 4 thư mục chính -->
     <div class="grid-container">
         
-        <!-- Mục 1: Trợ lý AI -->
+        <!-- Ô 1: Trợ lý AI -->
         <a href="ai.html" class="card">
             <span class="badge badge-ai">AI</span>
             <div class="card-icon">🤖</div>
@@ -119,22 +113,22 @@
             <div class="card-desc">Hỏi đáp & Phân tích</div>
         </a>
 
-        <!-- Mục 2: Ra-da Windy -->
-        <a href="radar.html" class="card">
+        <!-- Ô 2: Ra-da Windy -->
+        <a href="rada-windy.html" class="card">
             <span class="badge badge-live">LIVE</span>
             <div class="card-icon">🛰️</div>
             <div class="card-title">Ra-da Windy</div>
             <div class="card-desc">Bản đồ phóng to</div>
         </a>
 
-        <!-- Mục 3: Diễn biến mây dông -->
-        <a href="#" class="card">
+        <!-- Ô 3: Mây Dông (Đã gắn link Blogspot) -->
+        <a href="https://ptstormwatch.blogspot.com" class="card">
             <div class="card-icon">🌩️</div>
             <div class="card-title">Mây Dông</div>
-            <div class="card-desc">Theo dõi thực địa</div>
+            <div class="card-desc">Tin tức Blogspot</div>
         </a>
 
-        <!-- Mục 4: Phiên bản Beta hoặc Thời tiết chính -->
+        <!-- Ô 4: Trang Thời Tiết chính -->
         <a href="index.html" class="card">
             <div class="card-icon">🧪</div>
             <div class="card-title">Trang Thời Tiết</div>
