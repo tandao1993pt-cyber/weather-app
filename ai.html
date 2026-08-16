@@ -23,17 +23,23 @@ body {
     overflow: hidden;
 }
 
-/* Header kiểu Gemini Mobile */
+/* Header hiện đại - Dời tên app sang góc trái cạnh menu */
 .header {
     height: 60px;
     padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(12px);
     z-index: 20;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .header-btn {
@@ -60,16 +66,17 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 6px 16px;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 6px 14px;
     border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
     font-weight: 700;
     font-size: 14px;
     color: #38bdf8;
+    letter-spacing: 0.3px;
 }
 
-/* Off-canvas Menu 3 gạch */
+/* Menu 3 gạch tối giản */
 .drawer-overlay {
     position: fixed;
     top: 0;
@@ -99,8 +106,8 @@ body {
     z-index: 101;
     padding: 24px 18px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    justify-content: center;
     box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -109,30 +116,20 @@ body {
     transform: translateX(280px);
 }
 
-.drawer-header {
-    font-size: 18px;
-    font-weight: 800;
+/* Biểu tượng hình tròn có dấu chấm than duy nhất */
+.circle-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #38bdf8;
     color: #38bdf8;
-    margin-bottom: 10px;
-}
-
-.drawer-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #f1f5f9;
-    padding: 14px 16px;
-    border-radius: 18px;
-    font-size: 14px;
-    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 800;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
     cursor: pointer;
-    text-decoration: none;
-}
-
-.drawer-item:active {
-    background: rgba(56, 189, 248, 0.15);
 }
 
 /* Khung Chat */
@@ -146,7 +143,6 @@ body {
     scroll-behavior: smooth;
 }
 
-/* Bong bóng tin nhắn suy nghĩ */
 .message {
     display: flex;
     gap: 10px;
@@ -165,7 +161,6 @@ body {
     flex-direction: row-reverse;
 }
 
-/* Avatar AI có chuyển động nhịp thở */
 .ai-avatar {
     width: 38px;
     height: 38px;
@@ -219,7 +214,7 @@ body {
     background: rgba(30, 41, 59, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #f8fafc;
-    border-radius: 24px 24px 24px 6px; /* Bo tròn kiểu bong bóng nước */
+    border-radius: 24px 24px 24px 6px;
 }
 
 .user .content-bubble {
@@ -250,7 +245,7 @@ body {
     transform: scale(0.95);
 }
 
-/* Khung nhập liệu nổi kiểu Gemini */
+/* Khung nhập liệu nổi */
 .input-wrapper {
     position: fixed;
     bottom: 0;
@@ -351,27 +346,20 @@ textarea::placeholder { color: #64748b; }
 
 <body>
 
-<!-- Drawer Menu (3 gạch) -->
+<!-- Drawer Menu (Chỉ chứa hình tròn dấu chấm than) -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()">
     <div class="drawer" onclick="event.stopPropagation()">
-        <div class="drawer-header">Cài đặt & Tính năng</div>
-        <div class="drawer-item" onclick="newChat(); toggleMenu();">
-            <span>➕</span> Cuộc trò chuyện mới
-        </div>
-        <a href="index.html" class="drawer-item">
-            <span>🏠</span> Về trang chủ
-        </a>
-        <div class="drawer-item" onclick="alert('Đã xóa bộ nhớ đệm tạm thời.'); toggleMenu();">
-            <span>🧹</span> Dọn dẹp bộ nhớ
-        </div>
+        <div class="circle-icon">!</div>
     </div>
 </div>
 
-<!-- Header -->
+<!-- Header (Tên App dời về bên trái cạnh Menu) -->
 <header class="header">
-    <button class="header-btn" onclick="toggleMenu()">☰</button>
-    <div class="title-pill">
-        <span>嵐</span> Storm Watch AI
+    <div class="header-left">
+        <button class="header-btn" onclick="toggleMenu()">☰</button>
+        <div class="title-pill">
+            <span>嵐</span> Storm Watch AI
+        </div>
     </div>
     <button class="header-btn" onclick="newChat()">＋</button>
 </header>
@@ -405,7 +393,7 @@ textarea::placeholder { color: #64748b; }
 
 <script>
 const API_KEY = "AQ.Ab8RN6JUtmhcOh8UHTSXfJKPzS8XUu2nhdY1Sgz98pbjbL8n2w";
-const MODEL = "gemini-3.7-flash";
+const MODEL = "gemini-1.5-flash";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
