@@ -30,7 +30,7 @@
     .time-row-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 6px; }
     .status-badge { background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
-    /* Khung Thẻ Chính - Tone màu dịu mắt */
+    /* Khung Thẻ Chính */
     .card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
     .location-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .location-title { font-size: 22px; font-weight: 700; color: #ffffff; }
@@ -43,7 +43,7 @@
     /* Dẫn Hướng La Bàn */
     .compass-box { width: 85px; height: 85px; position: relative; }
 
-    /* Lưới Thông Số đầy đủ 9 ô */
+    /* Lưới Thông Số 9 ô */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
     .grid-item { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 6px; text-align: center; }
     .grid-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 500; }
@@ -97,7 +97,7 @@
       </div>
       <div class="time-row-bottom">
         <span>Tự động làm mới dữ liệu: <b>5 phút/lần</b></span>
-        <span class="status-badge">● MỚI NHẤT</span>
+        <span class="status-badge" id="statusBadge">● ĐANG TẢI...</span>
       </div>
     </div>
 
@@ -109,9 +109,9 @@
 
       <div class="main-wind">
         <div>
-          <div class="wind-gust">Gió giật <span id="windGust">50.8</span> km/h</div>
+          <div class="wind-gust">Gió giật <span id="windGust">--</span> km/h</div>
           <div>
-            <span class="wind-speed-val" id="windSpeed">20.6</span>
+            <span class="wind-speed-val" id="windSpeed">--</span>
             <span class="wind-speed-unit">km/h</span>
           </div>
         </div>
@@ -122,7 +122,7 @@
             <text x="50" y="88" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">S</text>
             <text x="88" y="53" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">E</text>
             <text x="12" y="53" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">W</text>
-            <g transform="rotate(254 50 50)">
+            <g id="compassNeedle" transform="rotate(0 50 50)">
               <polygon points="50,18 44,50 50,46" fill="#ef4444"/>
               <polygon points="50,18 56,50 50,46" fill="#dc2626"/>
               <polygon points="50,82 44,50 50,54" fill="#64748b"/>
@@ -135,26 +135,26 @@
 
       <!-- Detail Grid (9 ô) -->
       <div class="grid-container">
-        <div class="grid-item"><div class="grid-label">Nhiệt độ</div><div class="grid-value">28.6 °C</div></div>
-        <div class="grid-item"><div class="grid-label">Cảm nhận</div><div class="grid-value">32.2 °C</div></div>
-        <div class="grid-item"><div class="grid-label">Độ ẩm</div><div class="grid-value">80 %</div></div>
-        <div class="grid-item"><div class="grid-label">Áp suất</div><div class="grid-value">1007 hPa</div></div>
-        <div class="grid-item"><div class="grid-label">Khả năng mưa</div><div class="grid-value highlight-rain">89 %</div></div>
-        <div class="grid-item"><div class="grid-label">Mây phủ</div><div class="grid-value">61 %</div></div>
-        <div class="grid-item"><div class="grid-label">Chỉ số UV</div><div class="grid-value">1.8</div></div>
-        <div class="grid-item"><div class="grid-label">Tầm nhìn</div><div class="grid-value">8.0 km</div></div>
-        <div class="grid-item"><div class="grid-label">Điểm sương</div><div class="grid-value">24.9 °C</div></div>
+        <div class="grid-item"><div class="grid-label">Nhiệt độ</div><div class="grid-value" id="temp">-- °C</div></div>
+        <div class="grid-item"><div class="grid-label">Cảm nhận</div><div class="grid-value" id="apparentTemp">-- °C</div></div>
+        <div class="grid-item"><div class="grid-label">Độ ẩm</div><div class="grid-value" id="humidity">-- %</div></div>
+        <div class="grid-item"><div class="grid-label">Áp suất</div><div class="grid-value" id="pressure">-- hPa</div></div>
+        <div class="grid-item"><div class="grid-label">Khả năng mưa</div><div class="grid-value highlight-rain" id="pop">-- %</div></div>
+        <div class="grid-item"><div class="grid-label">Mây phủ</div><div class="grid-value" id="cloudCover">-- %</div></div>
+        <div class="grid-item"><div class="grid-label">Chỉ số UV</div><div class="grid-value" id="uvIndex">--</div></div>
+        <div class="grid-item"><div class="grid-label">Tầm nhìn</div><div class="grid-value" id="visibility">-- km</div></div>
+        <div class="grid-item"><div class="grid-label">Điểm sương</div><div class="grid-value" id="dewPoint">-- °C</div></div>
       </div>
 
       <!-- Info Box -->
       <div class="wind-info-box">
         <div class="info-row">
           <span class="info-label">Phương hướng gió</span>
-          <span class="info-val">Tây Tây Nam (WSW) (254°)</span>
+          <span class="info-val" id="windDirectionText">--</span>
         </div>
         <div class="info-row" style="align-items: center; margin-top: 4px;">
           <span class="info-label">BEAUFORT</span>
-          <span class="beaufort-tag">4/12 Gió vừa phải</span>
+          <span class="beaufort-tag" id="beaufortText">--</span>
         </div>
       </div>
     </div>
@@ -165,12 +165,8 @@
         <span>DỰ BÁO GIÓ & MƯA NGẮN HẠN</span>
         <span class="section-subtitle">MŨI TÊN CHỈ HƯỚNG GIÓ THỔI</span>
       </div>
-      <div class="forecast-scroll">
-        <div class="forecast-item"><div class="fc-time">16:00</div><div class="fc-icon">↙</div><div class="fc-dir">254° WSW</div><div class="fc-wind">22.1</div><div class="fc-rain">🌧 82%</div></div>
-        <div class="forecast-item"><div class="fc-time">17:00</div><div class="fc-icon">↙</div><div class="fc-dir">254° WSW</div><div class="fc-wind">20.4</div><div class="fc-rain">🌧 90%</div></div>
-        <div class="forecast-item"><div class="fc-time">18:00</div><div class="fc-icon">↙</div><div class="fc-dir">250° WSW</div><div class="fc-wind">22.4</div><div class="fc-rain">🌧 94%</div></div>
-        <div class="forecast-item"><div class="fc-time">19:00</div><div class="fc-icon">↙</div><div class="fc-dir">262° W</div><div class="fc-wind">19.1</div><div class="fc-rain">🌧 90%</div></div>
-        <div class="forecast-item"><div class="fc-time">20:00</div><div class="fc-icon">↙</div><div class="fc-dir">262° W</div><div class="fc-wind">16.2</div><div class="fc-rain">🌧 77%</div></div>
+      <div class="forecast-scroll" id="forecastScroll">
+        <!-- Đổ tự động bằng JS -->
       </div>
     </div>
 
@@ -186,8 +182,8 @@
             <div class="station-sub">Trạm chính - Áp suất & Vi khí hậu</div>
           </div>
           <div class="station-val">
-            <div class="station-speed">20.6 km/h</div>
-            <div class="station-status">4/12 Gió vừa phải</div>
+            <div class="station-speed" id="stPhuThuySpeed">-- km/h</div>
+            <div class="station-status" id="stPhuThuyStatus">--</div>
           </div>
         </div>
         <div class="station-item">
@@ -196,8 +192,8 @@
             <div class="station-sub">Trạm ven biển - Theo dõi hướng dông</div>
           </div>
           <div class="station-val">
-            <div class="station-speed">19.6 km/h</div>
-            <div class="station-status">Ổn định</div>
+            <div class="station-speed" id="stMuiNeSpeed">-- km/h</div>
+            <div class="station-status" id="stMuiNeStatus">--</div>
           </div>
         </div>
       </div>
@@ -205,31 +201,120 @@
   </div>
 
   <script>
-    // 1. Đồng hồ đếm thời gian thực
+    // 1. Đồng hồ thời gian thực
     function updateLiveTime() {
       const now = new Date();
       const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-      const dayName = days[now.getDay()];
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const year = now.getFullYear();
-      
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-
-      document.getElementById('liveDate').innerText = `${dayName}, ${day}/${month}/${year}`;
-      document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
+      document.getElementById('liveDate').innerText = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      document.getElementById('liveClock').innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
     }
-
     setInterval(updateLiveTime, 1000);
     updateLiveTime();
 
-    // 2. Tự động tải lại trang mỗi 5 phút (300.000 miligiây)
-    setInterval(function() {
-      location.reload();
-    }, 300000);
+    // 2. Chuyển đổi hướng gió sang tên viết tắt
+    function getWindDirName(deg) {
+      const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      const index = Math.round(deg / 22.5) % 16;
+      return dirs[index];
+    }
+
+    // 3. Quy đổi Cấp gió Beaufort
+    function getBeaufort(speedKmH) {
+      if (speedKmH < 2) return { level: 0, desc: "0/12 Lặng gió" };
+      if (speedKmH <= 5) return { level: 1, desc: "1/12 Gió nhẹ" };
+      if (speedKmH <= 11) return { level: 2, desc: "2/12 Gió nhẹ" };
+      if (speedKmH <= 19) return { level: 3, desc: "3/12 Gió yếu" };
+      if (speedKmH <= 28) return { level: 4, desc: "4/12 Gió vừa phải" };
+      if (speedKmH <= 38) return { level: 5, desc: "5/12 Gió khá mạnh" };
+      if (speedKmH <= 49) return { level: 6, desc: "6/12 Gió mạnh" };
+      if (speedKmH <= 61) return { level: 7, desc: "7/12 Gió rất mạnh" };
+      if (speedKmH <= 74) return { level: 8, desc: "8/12 Gió giật" };
+      if (speedKmH <= 88) return { level: 9, desc: "9/12 Gió rất giật" };
+      return { level: 10, desc: "10/12 Bão mạnh" };
+    }
+
+    // 4. Lấy dữ liệu thời tiết thực tế từ Open-Meteo cho Phan Thiết
+    async function fetchWeatherData() {
+      const statusBadge = document.getElementById('statusBadge');
+      statusBadge.innerText = "● ĐANG CẬP NHẬT...";
+      statusBadge.style.color = "#f59e0b";
+
+      // Tọa độ Phan Thiết: 10.9333, 108.1000
+      const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability&timezone=Asia%2FBangkok";
+
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const current = data.current;
+
+        // Cập nhật thẻ chính
+        document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1);
+        document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1);
+        document.getElementById('temp').innerText = `${current.temperature_2m.toFixed(1)} °C`;
+        document.getElementById('apparentTemp').innerText = `${current.apparent_temperature.toFixed(1)} °C`;
+        document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
+        document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
+        document.getElementById('pop').innerText = `${current.precipitation_probability ?? 0} %`;
+        document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
+        document.getElementById('uvIndex').innerText = current.uv_index.toFixed(1);
+        document.getElementById('visibility').innerText = `${(current.visibility / 1000).toFixed(1)} km`;
+        document.getElementById('dewPoint').innerText = `${current.dew_point_2m.toFixed(1)} °C`;
+
+        // Xoay kim la bàn theo hướng gió
+        const windDir = current.wind_direction_10m;
+        document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDir} 50 50)`);
+        document.getElementById('windDirectionText').innerText = `${getWindDirName(windDir)} (${windDir}°)`;
+
+        // Beaufort
+        const beaufort = getBeaufort(current.wind_speed_10m);
+        document.getElementById('beaufortText').innerText = beaufort.desc;
+
+        // Trạm thực địa
+        document.getElementById('stPhuThuySpeed').innerText = `${current.wind_speed_10m.toFixed(1)} km/h`;
+        document.getElementById('stPhuThuyStatus').innerText = beaufort.desc;
+
+        // Trạm Mũi Né (Mũi Né thường gió mạnh hơn ~10-15%)
+        const muiNeSpeed = current.wind_speed_10m * 1.12;
+        document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
+        document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
+
+        // Dự báo ngắn hạn (5 giờ tiếp theo)
+        const forecastContainer = document.getElementById('forecastScroll');
+        forecastContainer.innerHTML = '';
+        const nowHour = new Date().getHours();
+
+        for (let i = 0; i < 5; i++) {
+          const targetIndex = nowHour + i;
+          const timeLabel = `${String((nowHour + i) % 24).padStart(2, '0')}:00`;
+          const fcWind = data.hourly.wind_speed_10m[targetIndex]?.toFixed(1) || "--";
+          const fcDir = data.hourly.wind_direction_10m[targetIndex] || 0;
+          const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
+
+          forecastContainer.innerHTML += `
+            <div class="forecast-item">
+              <div class="fc-time">${timeLabel}</div>
+              <div class="fc-icon">↙</div>
+              <div class="fc-dir">${fcDir}° ${getWindDirName(fcDir)}</div>
+              <div class="fc-wind">${fcWind}</div>
+              <div class="fc-rain">🌧 ${fcRain}%</div>
+            </div>
+          `;
+        }
+
+        statusBadge.innerText = "● MỚI NHẤT";
+        statusBadge.style.color = "#4ade80";
+      } catch (err) {
+        console.error("Lỗi lấy dữ liệu:", err);
+        statusBadge.innerText = "● LỖI MẠNG";
+        statusBadge.style.color = "#ef4444";
+      }
+    }
+
+    // Tải dữ liệu ngay khi mở ứng dụng
+    fetchWeatherData();
+
+    // Tự động gọi API cập nhật dữ liệu mới ngầm đúng mỗi 5 phút (300.000 ms)
+    setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-  </html>
-  
+</html>
