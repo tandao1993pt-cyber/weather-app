@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -58,6 +59,8 @@
             color: #f8fafc;
             transition: all 0.15s ease;
             position: relative;
+            cursor: pointer;
+            z-index: 1;
         }
 
         .card:active {
@@ -66,8 +69,18 @@
         }
 
         .card-icon {
-            font-size: 30px;
+            width: 40px;
+            height: 40px;
             margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .card-title {
@@ -108,7 +121,9 @@
         <!-- Ô 1: Trợ lý AI -->
         <a href="ai.html" class="card">
             <span class="badge badge-ai">AI</span>
-            <div class="card-icon">🤖</div>
+            <div class="card-icon">
+                <img src="https://i.postimg.cc/c6GW8jW6/file-000000008a2881fa8230f667f92fe628.png" alt="AI">
+            </div>
             <div class="card-title">Trợ Lý AI</div>
             <div class="card-desc">Hỏi đáp & Phân tích</div>
         </a>
@@ -122,7 +137,7 @@
         </a>
 
         <!-- Ô 3: Mây Dông -->
-        <a href="https://ptstormwatch.blogspot.com" target="_top" class="card">
+        <a href="https://ptstormwatch.blogspot.com" target="_blank" class="card">
             <div class="card-icon">🌩️</div>
             <div class="card-title">Mây Dông</div>
             <div class="card-desc">Tin tức Blogspot</div>
