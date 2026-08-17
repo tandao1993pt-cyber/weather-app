@@ -160,6 +160,7 @@ body {
     flex-direction: row-reverse;
 }
 
+/* Avatar AI - Đã cập nhật không chớp liên tục nữa */
 .ai-avatar {
     width: 38px;
     height: 38px;
@@ -172,17 +173,22 @@ body {
     justify-content: center;
     font-weight: 800;
     font-size: 16px;
-    animation: pulseAvatar 2.5s infinite ease-in-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-@keyframes pulseAvatar {
+/* Hiệu ứng nhấp nháy nhẹ nhàng khi kích hoạt */
+.flashing-effect {
+    animation: gentleFlash 2s ease-in-out;
+}
+
+@keyframes gentleFlash {
     0%, 100% {
         transform: scale(1);
-        box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
     }
     50% {
-        transform: scale(1.08);
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+        transform: scale(1.06);
+        box-shadow: 0 0 18px rgba(239, 68, 68, 0.75);
     }
 }
 
@@ -400,6 +406,15 @@ const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const micBtn = document.getElementById("micBtn");
+
+// Tự động làm avatar nhấp nháy 2 giây sau mỗi 15 giây
+setInterval(() => {
+    const avatars = document.querySelectorAll('.ai-avatar');
+    avatars.forEach(avatar => {
+        avatar.classList.add('flashing-effect');
+        setTimeout(() => avatar.classList.remove('flashing-effect'), 2000);
+    });
+}, 15000);
 
 function toggleMenu() {
     document.getElementById("drawerOverlay").classList.toggle("active");
