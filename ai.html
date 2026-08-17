@@ -391,9 +391,9 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const API_KEY = "AQ.Ab8RN6JAe4H1sz_62yqbQqnq8J0iEoqBDxGTK7HYNF-WptELSw";
-const MODEL = "gemini-2.0-flash";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const API_KEY = "AQ.Ab8RN6IsPsTEmdrYfBO-aC-sL5Zhzhfvq7yzbgHdHTEmkzqWvA";
+const MODEL = "gemini-flash-latest";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
@@ -411,7 +411,8 @@ async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
             const response = await fetch(url, {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "X-goog-api-key": API_KEY
                 },
                 body: JSON.stringify(payload)
             });
@@ -623,5 +624,3 @@ function scrollBottom() {
 
 </body>
 </html>
-
-<!-- re-build -->
