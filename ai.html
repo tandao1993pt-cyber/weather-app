@@ -395,9 +395,9 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const API_KEY = "AQ.Ab8RN6IsPsTEmdrYfBO-aC-sL5Zhzhfvq7yzbgHdHTEmkzqWvA";
+const API_KEY = "AQ.Ab8RN6J7Mamj8izLx3wnamntfYBNj3k";
 const MODEL = "gemini-3.5-flash";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent?key=" + API_KEY;
     
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
@@ -424,8 +424,7 @@ async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
             const response = await fetch(url, {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json",
-                    "X-goog-api-key": API_KEY
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
             });
@@ -465,7 +464,7 @@ async function sendMessage() {
 
         if (!result.ok) {
             const errorMsg = result.data?.error?.message || "Lỗi phản hồi từ Google";
-            addAIMessage(`Không thể kết nối. Chi tiết lỗi: ${errorMsg}`);
+            addAIMessage("Không thể kết nối. Chi tiết lỗi: " + errorMsg);
             return;
         }
 
@@ -488,7 +487,7 @@ function sendQuickPrompt(promptText) {
 function addUserMessage(text) {
     const message = document.createElement("div");
     message.className = "message user";
-    message.innerHTML = `<div class="user-avatar">👤</div><div class="content-bubble"></div>`;
+    message.innerHTML = '<div class="user-avatar">👤</div><div class="content-bubble"></div>';
     message.querySelector(".content-bubble").textContent = text;
     chat.appendChild(message);
     scrollBottom();
@@ -527,7 +526,6 @@ function addAIMessage(text) {
     return message;
 }
 
-// Hàm đọc tiếng nói sử dụng SoundOfText API như đoạn code mẫu
 async function speakText(text, button) {
     if (!text) return;
 
@@ -552,7 +550,7 @@ async function speakText(text, button) {
         const data = await res.json();
 
         if (data.success && data.id) {
-            const audioUrl = `https://files.soundoftext.com/${data.id}.mp3`;
+            const audioUrl = "https://files.soundoftext.com/" + data.id + ".mp3";
             currentAudio = new Audio(audioUrl);
 
             if (button) button.innerHTML = "🔊 Đang đọc...";
@@ -643,17 +641,7 @@ function newChat() {
         currentAudio.pause();
         currentAudio = null;
     }
-    chat.innerHTML = `
-        <div class="message assistant">
-            <div class="ai-avatar">嵐</div>
-            <div class="content-bubble">
-                Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?
-                <div class="speaking-box">
-                    <button class="speak-btn" onclick="speakText('Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?', this)">🔊 Bấm để nghe</button>
-                </div>
-            </div>
-        </div>
-    `;
+    chat.innerHTML = '<div class="message assistant"><div class="ai-avatar">嵐</div><div class="content-bubble">Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?<div class="speaking-box"><button class="speak-btn" onclick="speakText(\'Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?\', this)">🔊 Bấm để nghe</button></div></div></div>';
 }
 
 function scrollBottom() {
