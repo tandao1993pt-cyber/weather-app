@@ -391,8 +391,7 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const API_KEY = "AQ.Ab8RN6KNL7Ou00XuxVbH4KcG1SvFwLmhFDqhQ6HCMiZpeoJvdA";
-const PROJECT_ID = "245286287710";
+const API_KEY = "AQ.Ab8RN6JAe4H1sz_62yqbQqnq8J0iEoqBDxGTK7HYNF-WptELSw";
 const MODEL = "gemini-2.0-flash";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
@@ -412,9 +411,7 @@ async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
             const response = await fetch(url, {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": API_KEY,
-                    "X-Goog-User-Project": PROJECT_ID
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
             });
