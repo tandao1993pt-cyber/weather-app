@@ -47,7 +47,6 @@
             gap: 12px;
         }
 
-        /* Đảm bảo thẻ a là block và phủ toàn bộ card */
         .card {
             display: flex;
             flex-direction: column;
@@ -61,6 +60,7 @@
             transition: all 0.2s ease;
             position: relative;
             cursor: pointer;
+            z-index: 10; /* Đảm bảo nổi lên trên */
         }
 
         .card:active {
@@ -77,7 +77,6 @@
             align-items: center;
         }
 
-        /* Chỉnh màu ảnh AI cho tiệp với tông dark mode */
         .card-icon img {
             width: 100%;
             height: 100%;
@@ -121,7 +120,7 @@
     <div class="grid-container">
         
         <!-- Ô 1: Trợ lý AI -->
-        <a href="ai.html" class="card">
+        <a href="ai.html" onclick="location.href='ai.html'; return false;" class="card">
             <span class="badge badge-ai">AI</span>
             <div class="card-icon">
                 <img src="https://i.postimg.cc/c6GW8jW6/file-000000008a2881fa8230f667f92fe628.png" alt="AI">
@@ -131,7 +130,7 @@
         </a>
 
         <!-- Ô 2: Ra-da Windy -->
-        <a href="rada-windy.html" class="card">
+        <a href="rada-windy.html" onclick="location.href='rada-windy.html'; return false;" class="card">
             <span class="badge badge-live">LIVE</span>
             <div class="card-icon">🛰️</div>
             <div class="card-title">Ra-da Windy</div>
@@ -146,7 +145,7 @@
         </a>
 
         <!-- Ô 4: Trang Thời Tiết chính -->
-        <a href="trang-chu.html" class="card">
+        <a href="trang-chu.html" onclick="location.href='trang-chu.html'; return false;" class="card">
             <div class="card-icon">🧪</div>
             <div class="card-title">Trang Thời Tiết</div>
             <div class="card-desc">Dữ liệu tổng hợp</div>
