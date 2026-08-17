@@ -240,7 +240,11 @@
         if (!response.ok) throw new Error("API Error");
         const data = await response.json();
         const current = data.current;
-        const nowHour = new Date().getHours();
+
+        // Định vị chỉ số giờ hiện tại chính xác dựa trên mảng thời gian từ API
+        const currentTimeString = current.time;
+        let startIndex = data.hourly.time.indexOf(currentTimeString);
+        if (startIndex === -1) startIndex = 0;
 
         document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1);
         document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1);
@@ -249,7 +253,7 @@
         document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
         document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
         
-        const currentRainProb = data.hourly.precipitation_probability[nowHour] ?? 0;
+        const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
         document.getElementById('pop').innerText = `${currentRainProb} %`;
 
         document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
@@ -274,9 +278,12 @@
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
 
-        for (let i = 0; i < 5; i++) {
-          const targetIndex = nowHour + i;
-          const timeLabel = `${String((nowHour + i) % 24).padStart(2, '0')}:00`;
+        for (let i = 0; i < 6; i++) {
+          const targetIndex = startIndex + i;
+          if (!data.hourly.time[targetIndex]) break;
+
+          const rawTime = new Date(data.hourly.time[targetIndex]);
+          const timeLabel = `${String(rawTime.getHours()).padStart(2, '0')}:00`;
           const fcWind = data.hourly.wind_speed_10m[targetIndex]?.toFixed(1) || "--";
           const fcDir = data.hourly.wind_direction_10m[targetIndex] || 0;
           const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
@@ -284,7 +291,7 @@
           forecastContainer.innerHTML += `
             <div class="forecast-item">
               <div class="fc-time">${timeLabel}</div>
-              <div class="fc-icon" style="transform: rotate(${fcDir}deg); display: inline-block;">⬆</div>
+              <div class="fc-icon" style="transform: rotate(${fcDir + 180}deg); display: inline-block;">⬆</div>
               <div class="fc-dir">${fcDir}° ${getWindDirName(fcDir)}</div>
               <div class="fc-wind">${fcWind} km/h</div>
               <div class="fc-rain">🌧 ${fcRain}%</div>
