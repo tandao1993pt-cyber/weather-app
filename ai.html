@@ -2,185 +2,300 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>嵐 STORM WATCH AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Storm Watch AI 嵐</title>
 
 <style>
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    margin: 0;
-    background: #212121;
-    color: #ececec;
-    font-family: Arial, Helvetica, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 
-.app {
-    display: flex;
-    height: 100vh;
-}
-
-.sidebar {
-    width: 260px;
-    background: #171717;
-    border-right: 1px solid #303030;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-}
-
-.logo {
+/* Header */
+.header {
+    height: 60px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 8px 22px;
-    font-weight: bold;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 20;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.logo-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(135deg,#ff3b30,#ff9500);
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-}
-
-.logo-text {
-    font-size: 15px;
-}
-
-.new-chat {
-    border: 1px solid #444;
-    background: #242424;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
     cursor: pointer;
-    text-align: left;
-    font-size: 14px;
+    transition: all 0.2s;
 }
 
-.new-chat:hover {
-    background: #303030;
+.header-btn:active {
+    transform: scale(0.92);
+    background: rgba(255, 255, 255, 0.15);
 }
 
-.sidebar-bottom {
-    margin-top: auto;
-    color: #888;
-    font-size: 12px;
-    padding: 10px;
-}
-
-.main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.header {
-    height: 60px;
+.title-pill {
     display: flex;
     align-items: center;
-    padding: 0 18px;
-    border-bottom: 1px solid #303030;
-    background: #212121;
+    gap: 8px;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    font-weight: 700;
+    font-size: 14px;
+    color: #38bdf8;
+    letter-spacing: 0.3px;
 }
 
-.header-title {
-    font-weight: bold;
+/* Menu */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
-.header-subtitle {
-    color: #888;
-    font-size: 12px;
-    margin-left: 8px;
+.drawer-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
+.drawer {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: #1e293b;
+    z-index: 101;
+    padding: 24px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer-overlay.active .drawer {
+    transform: translateX(280px);
+}
+
+.circle-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #38bdf8;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 800;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    cursor: pointer;
+}
+
+/* Khung Chat */
 .chat {
     flex: 1;
     overflow-y: auto;
-    padding: 25px 15%;
+    padding: 16px 14px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
 }
 
 .message {
     display: flex;
-    gap: 14px;
-    margin-bottom: 28px;
-    line-height: 1.6;
+    gap: 10px;
+    align-items: flex-start;
+    max-width: 90%;
+    animation: bubblePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.avatar {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
+@keyframes bubblePop {
+    0% { opacity: 0; transform: translateY(16px) scale(0.92); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.user-avatar {
-    background: #444;
+.message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
 }
 
 .ai-avatar {
-    background: linear-gradient(135deg,#ff3b30,#ff9500);
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.content {
-    max-width: 850px;
-    white-space: pre-wrap;
+.flashing-effect {
+    animation: gentleFlash 2s ease-in-out;
+}
+
+@keyframes gentleFlash {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 18px rgba(239, 68, 68, 0.75);
+    }
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.content-bubble {
+    padding: 14px 18px;
+    font-size: 14.5px;
+    line-height: 1.6;
     word-break: break-word;
+    white-space: pre-wrap;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-.user .content {
-    background: #303030;
-    padding: 10px 14px;
-    border-radius: 15px;
+.assistant .content-bubble {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    border-radius: 24px 24px 24px 6px;
 }
 
-.welcome {
-    max-width: 700px;
-    margin: 15vh auto 0;
-    text-align: center;
+.user .content-bubble {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: #ffffff;
+    border-radius: 22px 22px 6px 22px;
+    font-weight: 400;
+    letter-spacing: 0.2px;
 }
 
-.welcome h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
+.speaking-box {
+    margin-top: 8px;
 }
 
-.welcome p {
-    color: #999;
+.speak-btn {
+    background: #ef4444;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    border: none;
 }
 
-.input-area {
-    padding: 15px 15%;
-    background: linear-gradient(transparent, #212121 20%);
+.speak-btn:active {
+    transform: scale(0.95);
+}
+
+/* Khung Nhập Liệu */
+.input-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    padding: 10px 14px 16px;
+    background: linear-gradient(to top, #0f172a 70%, transparent);
+    z-index: 20;
+}
+
+.quick-prompts {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+
+.quick-prompts::-webkit-scrollbar { display: none; }
+
+.prompt-chip {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.prompt-chip:active {
+    background: rgba(56, 189, 248, 0.2);
 }
 
 .input-box {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #303030;
-    border: 1px solid #555;
-    border-radius: 18px;
-    padding: 8px 10px 8px 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.25);
-}
-
-.input-box:focus-within {
-    border-color: #777;
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    padding: 6px 8px 6px 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
 
 textarea {
@@ -189,112 +304,94 @@ textarea {
     border: none;
     outline: none;
     background: transparent;
-    color: white;
-    font-size: 15px;
-    line-height: 1.4;
-    max-height: 130px;
-    padding: 8px 0;
+    color: #ffffff;
+    font-size: 14.5px;
+    line-height: 1.5;
+    max-height: 100px;
+    padding: 6px 0;
+    font-family: inherit;
 }
 
-button {
-    border: none;
-    cursor: pointer;
-}
+textarea::placeholder { color: #64748b; }
 
-.icon-btn {
-    width: 38px;
-    height: 38px;
+.action-btn {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: transparent;
-    color: #ccc;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s;
 }
 
-.icon-btn:hover {
-    background: #444;
+.action-btn:active { transform: scale(0.9); }
+
+.mic-btn {
+    background: transparent;
+    color: #38bdf8;
+}
+
+.mic-btn.recording {
+    color: #ef4444;
+    animation: pulseMic 1s infinite;
+}
+
+@keyframes pulseMic {
+    50% { transform: scale(1.2); }
 }
 
 .send-btn {
-    background: white;
-    color: black;
-}
-
-.send-btn:hover {
-    background: #ddd;
-}
-
-.recording {
-    color: #ff453a;
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    50% { transform: scale(1.15); }
-}
-
-.speaking {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 8px;
-}
-
-.speak-btn {
-    background: transparent;
-    color: #aaa;
-    font-size: 16px;
-}
-
-.speak-btn:hover {
-    color: white;
-}
-
-@media (max-width: 700px) {
-    .sidebar { display: none; }
-    .chat { padding: 20px 12px; }
-    .input-area { padding: 10px; }
-    .welcome { margin-top: 18vh; }
-    .welcome h1 { font-size: 25px; }
-    .header-subtitle { display: none; }
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-    <aside class="sidebar">
-        <div class="logo">
-            <div class="logo-icon">嵐</div>
-            <div class="logo-text">STORM WATCH AI</div>
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()">
+    <div class="drawer" onclick="event.stopPropagation()">
+        <div class="circle-icon">!</div>
+    </div>
+</div>
+
+<header class="header">
+    <div class="header-left">
+        <button class="header-btn" onclick="toggleMenu()">☰</button>
+        <div class="title-pill">
+            <span>嵐</span> Storm Watch AI
         </div>
-        <button class="new-chat" onclick="newChat()">＋ Cuộc trò chuyện mới</button>
-        <div class="sidebar-bottom">
-            嵐 Storm Watch AI<br>Trợ lý thực địa Phan Thiết
-        </div>
-    </aside>
+    </div>
+    <button class="header-btn" onclick="newChat()">＋</button>
+</header>
 
-    <main class="main">
-        <header class="header">
-            <span class="header-title">Storm Watch AI</span>
-            <span class="header-subtitle">Trợ lý dông lốc Phan Thiết</span>
-        </header>
-
-        <section class="chat" id="chat">
-            <div class="welcome" id="welcome">
-                <h1>嵐 Storm Watch AI</h1>
-                <p>Trợ lý AI thực địa dông lốc Phan Thiết. Nhập văn bản hoặc bấm micro để nói.</p>
-            </div>
-        </section>
-
-        <div class="input-area">
-            <div class="input-box">
-                <button id="micBtn" class="icon-btn" onclick="toggleVoice()" title="Nói">🎙️</button>
-                <textarea id="input" rows="1" placeholder="Nhắn tin cho Storm Watch AI..." onkeydown="handleKey(event)"></textarea>
-                <button class="icon-btn send-btn" onclick="sendMessage()" title="Gửi">↑</button>
+<main class="chat" id="chat">
+    <div class="message assistant">
+        <div class="ai-avatar">嵐</div>
+        <div class="content-bubble">
+            Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?
+            <div class="speaking-box">
+                <button class="speak-btn" onclick="speakText('Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?', this)">🔊 Bấm để nghe</button>
             </div>
         </div>
-    </main>
+    </div>
+</main>
+
+<div class="input-wrapper">
+    <div class="quick-prompts">
+        <div class="prompt-chip" onclick="sendQuickPrompt('Thời tiết Phan Thiết hiện tại sao rồi?')">🌧 Thời tiết hiện tại</div>
+        <div class="prompt-chip" onclick="sendQuickPrompt('Hôm nay Mũi Né gió có mạnh không?')">💨 Gió Mũi Né</div>
+        <div class="prompt-chip" onclick="sendQuickPrompt('Tối nay có nguy cơ mưa dông không?')">⚡ Cảnh báo dông lốc</div>
+    </div>
+    <div class="input-box">
+        <button id="micBtn" class="action-btn mic-btn" onclick="toggleVoice()" title="Nói">🎙️</button>
+        <textarea id="input" rows="1" placeholder="Nhắn tin cho Storm Watch AI..." onkeydown="handleKey(event)"></textarea>
+        <button class="action-btn send-btn" onclick="sendMessage()" title="Gửi">↑</button>
+    </div>
 </div>
 
 <script>
@@ -308,39 +405,47 @@ const API_URL =
     "https://generativelanguage.googleapis.com/v1beta/models/" +  
     GEMINI_MODEL +  
     ":generateContent";
-
-const SYSTEM_INSTRUCTION = "Bạn là PT StormWatch AI, trợ lý AI thực địa chuyên về ghi chép nhật ký, theo dõi và hỗ trợ thông tin dông lốc tại Phan Thiết. Bạn nói chuyện ngắn gọn, trực diện, đi thẳng vào vấn đề chính, thực tế và chính xác 100%. Không dùng câu từ xã giao hay sáo rỗng.";
+    
+const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const micBtn = document.getElementById("micBtn");
+let currentAudio = null;
 
-/* Hàm gửi yêu cầu với cơ chế tự động thử lại khi máy chủ bận */
-async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
+setInterval(() => {
+    const avatars = document.querySelectorAll('.ai-avatar');
+    avatars.forEach(avatar => {
+        avatar.classList.add('flashing-effect');
+        setTimeout(() => avatar.classList.remove('flashing-effect'), 2000);
+    });
+}, 15000);
+
+function toggleMenu() {
+    document.getElementById("drawerOverlay").classList.toggle("active");
+}
+
+async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
             const response = await fetch(`${url}?key=${GEMINI_API_KEY}`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(payload)
             });
-
             const data = await response.json();
-
-            // Nếu thành công trả về ngay
             if (response.ok) return { ok: true, data };
-
-            // Nếu gặp lỗi bận mạng (high demand) hoặc 429, thử lại
-            const errMsg = data.error?.message || "";
-            if ((errMsg.includes("high demand") || response.status === 429) && attempt < maxRetries) {
-                await new Promise(res => setTimeout(res, delayMs * (attempt + 1)));
+            
+            if (attempt < maxRetries && response.status === 429) {
+                await new Promise(res => setTimeout(res, delayMs));
                 continue;
             }
-
-            return { ok: false, data };
+            return { ok: false, data, status: response.status };
         } catch (err) {
             if (attempt === maxRetries) throw err;
-            await new Promise(res => setTimeout(res, delayMs * (attempt + 1)));
+            await new Promise(res => setTimeout(res, delayMs));
         }
     }
 }
@@ -349,48 +454,48 @@ async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
-    document.getElementById("welcome")?.remove();
     addUserMessage(text);
     input.value = "";
     autoResize();
 
-    const loading = addAIMessage("Đang kết nối...");
+    const loading = addAIMessage("Đang suy nghĩ...");
 
     try {
         const payload = {
-            system_instruction: {
-                parts: [{ text: SYSTEM_INSTRUCTION }]
-            },
-            contents: [
-                { parts: [{ text: text }] }
-            ]
+            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+            contents: [{ parts: [{ text: text }] }]
         };
 
         const result = await fetchWithRetry(API_URL, payload);
         loading.remove();
 
         if (!result.ok) {
-            addAIMessage("⚠️ Lỗi API: " + (result.data.error?.message || "Máy chủ bận, vui lòng thử lại."));
+            const errorMsg = result.data?.error?.message || "Lỗi phản hồi từ Google";
+            addAIMessage("Không thể kết nối. Chi tiết lỗi: " + errorMsg);
             return;
         }
 
-        const reply = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được phản hồi từ AI.";
-        const aiMessageNode = addAIMessage(reply);
-        
-        const speakBtn = aiMessageNode.querySelector(".speak-btn");
-        if (speakBtn) speakText(reply, speakBtn);
+        let reply = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Chưa nhận được câu trả lời.";
+        reply = reply.replace(/[*#_~`]/g, '');
+
+        addAIMessage(reply);
 
     } catch (error) {
         loading.remove();
-        addAIMessage("⚠️ Không thể kết nối, hãy thử lại sau giây lát.");
+        addAIMessage("Lỗi mạng internet. Bạn kiểm tra lại kết nối Wifi/4G nhé.");
     }
+}
+
+function sendQuickPrompt(promptText) {
+    input.value = promptText;
+    sendMessage();
 }
 
 function addUserMessage(text) {
     const message = document.createElement("div");
     message.className = "message user";
-    message.innerHTML = `<div class="avatar user-avatar">👤</div><div class="content"></div>`;
-    message.querySelector(".content").textContent = text;
+    message.innerHTML = '<div class="user-avatar">👤</div><div class="content-bubble"></div>';
+    message.querySelector(".content-bubble").textContent = text;
     chat.appendChild(message);
     scrollBottom();
 }
@@ -400,24 +505,26 @@ function addAIMessage(text) {
     message.className = "message assistant";
 
     const avatar = document.createElement("div");
-    avatar.className = "avatar ai-avatar";
+    avatar.className = "ai-avatar";
     avatar.textContent = "嵐";
 
     const content = document.createElement("div");
-    content.className = "content";
+    content.className = "content-bubble";
     content.textContent = text;
 
-    const controls = document.createElement("div");
-    controls.className = "speaking";
+    if (text !== "Đang suy nghĩ...") {
+        const controls = document.createElement("div");
+        controls.className = "speaking-box";
 
-    const speak = document.createElement("button");
-    speak.className = "speak-btn";
-    speak.textContent = "🔊";
-    speak.title = "Đọc câu trả lời";
-    speak.onclick = () => speakText(content.textContent, speak);
+        const speak = document.createElement("button");
+        speak.className = "speak-btn";
+        speak.innerHTML = "🔊 Bấm để nghe";
+        speak.onclick = () => speakText(text, speak);
 
-    controls.appendChild(speak);
-    content.appendChild(controls);
+        controls.appendChild(speak);
+        content.appendChild(controls);
+    }
+
     message.appendChild(avatar);
     message.appendChild(content);
     chat.appendChild(message);
@@ -426,19 +533,51 @@ function addAIMessage(text) {
     return message;
 }
 
-function speakText(text, button) {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
+async function speakText(text, button) {
+    if (!text) return;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "vi-VN";
-    utterance.rate = 1;
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
 
-    button.textContent = "⏹️";
-    utterance.onend = () => { button.textContent = "🔊"; };
-    utterance.onerror = () => { button.textContent = "🔊"; };
+    const cleanText = text.replace(/[*#_~`]/g, '').trim().substring(0, 150);
+    if (button) button.innerHTML = "⏳ Đang tải...";
 
-    speechSynthesis.speak(utterance);
+    try {
+        const res = await fetch("https://api.soundoftext.com/sounds", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                engine: "Google",
+                data: { text: cleanText, voice: "vi-VN" }
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.id) {
+            const audioUrl = "https://files.soundoftext.com/" + data.id + ".mp3";
+            currentAudio = new Audio(audioUrl);
+
+            if (button) button.innerHTML = "🔊 Đang đọc...";
+
+            currentAudio.play().catch(() => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            });
+
+            currentAudio.onended = () => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            };
+            currentAudio.onerror = () => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            };
+        } else {
+            if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+        }
+    } catch (e) {
+        if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+    }
 }
 
 let recognition = null;
@@ -481,7 +620,7 @@ if (SpeechRecognition) {
 
 function toggleVoice() {
     if (!recognition) {
-        alert("Thiết bị hoặc WebView chưa cấp quyền giọng nói.");
+        alert("Thiết bị hoặc trình duyệt chưa hỗ trợ micro web.");
         return;
     }
     if (isRecording) {
@@ -501,17 +640,15 @@ function handleKey(event) {
 input.addEventListener("input", autoResize);
 function autoResize() {
     input.style.height = "auto";
-    input.style.height = Math.min(input.scrollHeight, 130) + "px";
+    input.style.height = Math.min(input.scrollHeight, 100) + "px";
 }
 
 function newChat() {
-    speechSynthesis?.cancel();
-    chat.innerHTML = `
-        <div class="welcome" id="welcome">
-            <h1>嵐 Storm Watch AI</h1>
-            <p>Trợ lý AI thực địa dông lốc Phan Thiết. Nhập văn bản hoặc bấm micro để nói.</p>
-        </div>
-    `;
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    chat.innerHTML = '<div class="message assistant"><div class="ai-avatar">嵐</div><div class="content-bubble">Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?<div class="speaking-box"><button class="speak-btn" onclick="speakText(\'Xin chào! Tôi là Storm Watch AI. Bạn cần tôi hỗ trợ thông tin thời tiết hay dông lốc Phan Thiết hôm nay?\', this)">🔊 Bấm để nghe</button></div></div></div>';
 }
 
 function scrollBottom() {
