@@ -380,9 +380,9 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const ACCESS_TOKEN = "AQ.Ab8RN6LTbGNHxaYO8tITL3QePDAKT2N47k5DfdSFrb81U9pZmw";
-const WORKER_URL = "https://billowing-wood-5ba7.tandao1993pt.workers.dev";
-const API_URL = WORKER_URL + "/?key=" + ACCESS_TOKEN;
+const API_KEY = "AQ.Ab8RN6Kve3X8bBnyuNznuyZ9TGDuEY90vGDwbdagouSfy0TrkQ";
+const MODEL = "gemini-3.7-flash";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
     
 /* Cấu hình chuẩn từ bản code cũ giúp AI trả lời cực kỳ tự nhiên, mượt mà */
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
