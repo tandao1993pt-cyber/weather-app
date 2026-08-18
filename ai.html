@@ -232,21 +232,26 @@ button {
     50% { transform: scale(1.15); }
 }
 
+/* Nút đọc âm thanh nổi bật dành cho người nghe */
 .speaking {
+    margin-top: 10px;
+}
+
+.big-speak-btn {
+    background: #ff9500;
+    color: #000;
+    font-weight: bold;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-top: 8px;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(255, 149, 0, 0.3);
 }
 
-.speak-btn {
-    background: transparent;
-    color: #aaa;
-    font-size: 16px;
-}
-
-.speak-btn:hover {
-    color: white;
+.big-speak-btn:active {
+    transform: scale(0.96);
 }
 
 @media (max-width: 700px) {
@@ -283,7 +288,7 @@ button {
         <section class="chat" id="chat">
             <div class="welcome" id="welcome">
                 <h1>嵐 Storm Watch AI</h1>
-                <p>Trợ lý AI thực địa dông lốc Phan Thiết. Nhập văn bản hoặc bấm micro để nói.</p>
+                <p>Bấm nút Micro màu đỏ bên dưới để nói chuyện với AI.</p>
             </div>
         </section>
 
@@ -298,17 +303,24 @@ button {
 </div>
 
 <script>
-const API_KEY = "gen-lang-client-0901621032";
+const API_KEY = "AQ.Ab8RN6JUtmhcOh8UHTSXfJKPzS8XUu2nhdY1Sgz98pbjbL8n2w";
 const MODEL = "gemini-3.7-flash";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
-const SYSTEM_INSTRUCTION = "Bạn là PT StormWatch AI, trợ lý AI thực địa chuyên về ghi chép nhật ký, theo dõi và hỗ trợ thông tin dông lốc tại Phan Thiết. Bạn nói chuyện ngắn gọn, trực diện, đi thẳng vào vấn đề chính, thực tế và chính xác 100%. Không dùng câu từ xã giao hay sáo rỗng.";
+/* Cấu hình ép AI nói tiếng Việt thuần túy, ngắn gọn để máy đọc giọng nói đọc mượt nhất */
+const SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const micBtn = document.getElementById("micBtn");
 
-/* Hàm gửi yêu cầu với cơ chế tự động thử lại khi máy chủ bận */
+/* Nạp trước danh sách giọng nói hệ thống */
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
+}
+
 async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
@@ -317,19 +329,14 @@ async function fetchWithRetry(url, payload, maxRetries = 2, delayMs = 1500) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
-
             const data = await response.json();
-
-            // Nếu thành công trả về ngay
             if (response.ok) return { ok: true, data };
-
-            // Nếu gặp lỗi bận mạng (high demand) hoặc 429, thử lại
+            
             const errMsg = data.error?.message || "";
             if ((errMsg.includes("high demand") || response.status === 429) && attempt < maxRetries) {
                 await new Promise(res => setTimeout(res, delayMs * (attempt + 1)));
                 continue;
             }
-
             return { ok: false, data };
         } catch (err) {
             if (attempt === maxRetries) throw err;
@@ -347,7 +354,7 @@ async function sendMessage() {
     input.value = "";
     autoResize();
 
-    const loading = addAIMessage("Đang kết nối...");
+    const loading = addAIMessage("Đang suy nghĩ...");
 
     try {
         const payload = {
@@ -363,19 +370,24 @@ async function sendMessage() {
         loading.remove();
 
         if (!result.ok) {
-            addAIMessage("⚠️ Lỗi API: " + (result.data.error?.message || "Máy chủ bận, vui lòng thử lại."));
+            addAIMessage("Có lỗi kết nối. Bạn bấm gửi lại giúp tôi nhé.");
             return;
         }
 
-        const reply = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được phản hồi từ AI.";
+        let reply = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Chưa nhận được câu trả lời.";
+        
+        // Loại bỏ triệt để các ký tự rác trước khi hiển thị
+        reply = reply.replace(/[*#_~`]/g, '');
+
         const aiMessageNode = addAIMessage(reply);
         
-        const speakBtn = aiMessageNode.querySelector(".speak-btn");
+        // Tự động phát âm thanh
+        const speakBtn = aiMessageNode.querySelector(".big-speak-btn");
         if (speakBtn) speakText(reply, speakBtn);
 
     } catch (error) {
         loading.remove();
-        addAIMessage("⚠️ Không thể kết nối, hãy thử lại sau giây lát.");
+        addAIMessage("Không có kết nối mạng. Bạn kiểm tra lại wifi hoặc 4G nhé.");
     }
 }
 
@@ -404,10 +416,9 @@ function addAIMessage(text) {
     controls.className = "speaking";
 
     const speak = document.createElement("button");
-    speak.className = "speak-btn";
-    speak.textContent = "🔊";
-    speak.title = "Đọc câu trả lời";
-    speak.onclick = () => speakText(content.textContent, speak);
+    speak.className = "big-speak-btn";
+    speak.innerHTML = "🔊 Bấm để nghe đọc";
+    speak.onclick = () => speakText(text, speak);
 
     controls.appendChild(speak);
     content.appendChild(controls);
@@ -419,17 +430,30 @@ function addAIMessage(text) {
     return message;
 }
 
+/* Hàm đọc tiếng Việt chuẩn, lọc sạch ký tự lạ */
 function speakText(text, button) {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
+    if (!("speechSynthesis" in window)) {
+        alert("Điện thoại của bạn chưa bật tính năng đọc giọng nói.");
+        return;
+    }
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.cancel(); // Dừng câu cũ
+
+    // Làm sạch văn bản một lần nữa cho chắc chắn
+    const cleanText = text.replace(/[*#_~`]/g, '').trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "vi-VN";
-    utterance.rate = 1;
+    utterance.rate = 0.95; // Đọc chậm rãi, rõ ràng
 
-    button.textContent = "⏹️";
-    utterance.onend = () => { button.textContent = "🔊"; };
-    utterance.onerror = () => { button.textContent = "🔊"; };
+    const voices = speechSynthesis.getVoices();
+    const viVoice = voices.find(v => v.lang.includes("vi") || v.lang.includes("VI"));
+    if (viVoice) utterance.voice = viVoice;
+
+    if (button) button.innerHTML = "⏹️ Đang phát tiếng...";
+
+    utterance.onend = () => { if (button) button.innerHTML = "🔊 Bấm để nghe lại"; };
+    utterance.onerror = () => { if (button) button.innerHTML = "🔊 Bấm để nghe lại"; };
 
     speechSynthesis.speak(utterance);
 }
@@ -474,7 +498,7 @@ if (SpeechRecognition) {
 
 function toggleVoice() {
     if (!recognition) {
-        alert("Thiết bị hoặc WebView chưa cấp quyền giọng nói.");
+        alert("Chưa bật quyền micro trên điện thoại.");
         return;
     }
     if (isRecording) {
@@ -502,7 +526,7 @@ function newChat() {
     chat.innerHTML = `
         <div class="welcome" id="welcome">
             <h1>嵐 Storm Watch AI</h1>
-            <p>Trợ lý AI thực địa dông lốc Phan Thiết. Nhập văn bản hoặc bấm micro để nói.</p>
+            <p>Bấm nút Micro màu đỏ bên dưới để nói chuyện với AI.</p>
         </div>
     `;
 }
