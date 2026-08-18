@@ -384,19 +384,12 @@ const API_KEY = "AQ.Ab8RN6Kve3X8bBnyuNznuyZ9TGDuEY90vGDwbdagouSfy0TrkQ";
 const MODEL = "gemini-3.7-flash";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
     
-/* Cấu hình chuẩn từ bản code cũ giúp AI trả lời cực kỳ tự nhiên, mượt mà */
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const micBtn = document.getElementById("micBtn");
-
-/* Nạp sẵn bộ giọng đọc thiết bị */
-if ('speechSynthesis' in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-    };
-}
+let currentAudio = null;
 
 function toggleMenu() {
     document.getElementById("drawerOverlay").classList.toggle("active");
@@ -438,7 +431,6 @@ async function sendMessage() {
     const loading = addAIMessage("Đang suy nghĩ...");
 
     try {
-        // Đúng cấu hình chuẩn system_instruction từ bản cũ
         const payload = {
             system_instruction: { 
                 parts: [{ text: SYSTEM_INSTRUCTION }] 
@@ -458,14 +450,9 @@ async function sendMessage() {
 
         let reply = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Chưa nhận được câu trả lời.";
         
-        // Lọc sạch toàn bộ ký tự rác
         reply = reply.replace(/[*#_~`]/g, '');
 
-        const aiNode = addAIMessage(reply);
-        
-        // Tự động phát âm thanh đọc giọng nói
-        const speakBtn = aiNode.querySelector(".speak-btn");
-        if (speakBtn) speakText(reply, speakBtn);
+        addAIMessage(reply);
 
     } catch (error) {
         loading.remove();
@@ -520,31 +507,51 @@ function addAIMessage(text) {
     return message;
 }
 
-/* Hàm đọc tiếng Việt hệ thống từ bản code cũ hoạt động cực kỳ ổn định */
-function speakText(text, button) {
-    if (!("speechSynthesis" in window)) {
-        alert("Điện thoại của bạn chưa bật tính năng đọc giọng nói.");
-        return;
+async function speakText(text, button) {
+    if (!text) return;
+
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
     }
 
-    speechSynthesis.cancel();
+    const cleanText = text.replace(/[*#_~`]/g, '').trim().substring(0, 150);
+    if (button) button.innerHTML = "⏳ Đang tải...";
 
-    const cleanText = text.replace(/[*#_~`]/g, '').trim();
+    try {
+        const res = await fetch("https://api.soundoftext.com/sounds", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                engine: "Google",
+                data: { text: cleanText, voice: "vi-VN" }
+            })
+        });
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = "vi-VN";
-    utterance.rate = 0.95;
+        const data = await res.json();
 
-    const voices = speechSynthesis.getVoices();
-    const viVoice = voices.find(v => v.lang.includes("vi") || v.lang.includes("VI"));
-    if (viVoice) utterance.voice = viVoice;
+        if (data.success && data.id) {
+            const audioUrl = "https://files.soundoftext.com/" + data.id + ".mp3";
+            currentAudio = new Audio(audioUrl);
 
-    if (button) button.innerHTML = "⏹️ Đang phát tiếng...";
+            if (button) button.innerHTML = "🔊 Đang đọc...";
 
-    utterance.onend = () => { if (button) button.innerHTML = "🔊 Bấm để nghe lại"; };
-    utterance.onerror = () => { if (button) button.innerHTML = "🔊 Bấm để nghe lại"; };
+            currentAudio.play().catch(() => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            });
 
-    speechSynthesis.speak(utterance);
+            currentAudio.onended = () => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            };
+            currentAudio.onerror = () => {
+                if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+            };
+        } else {
+            if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+        }
+    } catch (e) {
+        if (button) button.innerHTML = "🔊 Bấm để nghe lại";
+    }
 }
 
 let recognition = null;
@@ -587,7 +594,7 @@ if (SpeechRecognition) {
 
 function toggleVoice() {
     if (!recognition) {
-        alert("Chưa bật quyền micro trên điện thoại.");
+        alert("Thiết bị hoặc trình duyệt chưa hỗ trợ micro web.");
         return;
     }
     if (isRecording) {
@@ -611,7 +618,10 @@ function autoResize() {
 }
 
 function newChat() {
-    speechSynthesis?.cancel();
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
     chat.innerHTML = `
         <div class="message assistant">
             <div class="ai-avatar">嵐</div>
