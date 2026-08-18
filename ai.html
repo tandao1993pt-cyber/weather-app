@@ -397,7 +397,7 @@ textarea::placeholder { color: #64748b; }
 <script>
 const GEMINI_API_KEY = "AQ.Ab8RN6JojoS8DOSyOwxVtL_SYG-nzkTfGb_n-b7ugCvp3-2_Dg";  
   
-// Model Gemini hiện tại  
+// Model Gemini giữ nguyên theo yêu cầu
 const GEMINI_MODEL = "gemini-3.6-flash";  
   
 // Endpoint Gemini chính thức  
@@ -462,7 +462,7 @@ async function sendMessage() {
 
     try {
         const payload = {
-            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+            system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
             contents: [{ parts: [{ text: text }] }]
         };
 
