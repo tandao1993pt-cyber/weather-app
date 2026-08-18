@@ -395,17 +395,17 @@ textarea::placeholder { color: #64748b; }
 </div>
 
 <script>
-const GEMINI_API_KEY = "AQ.Ab8RN6JojoS8DOSyOwxVtL_SYG-nzkTfGb_n-b7ugCvp3-2_Dg";  
-  
+const GEMINI_API_KEY = "AQ.Ab8RN6JojoS8DOSyOwxVtL_SYG-nzkTfGb_n-b7ugCvp3-2_Dg";
+
 // Model Gemini giữ nguyên theo yêu cầu
-const GEMINI_MODEL = "gemini-3.6-flash";  
-  
-// Endpoint Gemini chính thức  
-const API_URL =  
-    "https://generativelanguage.googleapis.com/v1beta/models/" +  
-    GEMINI_MODEL +  
+const GEMINI_MODEL = "gemini-3.6-flash";
+
+// Endpoint Gemini chính thức
+const API_URL =
+    "https://generativelanguage.googleapis.com/v1beta/models/" +
+    GEMINI_MODEL +
     ":generateContent";
-    
+
 const SYSTEM_INSTRUCTION = "Bạn là trợ lý Storm Watch AI. Hãy trả lời bằng tiếng Việt phổ thông chuẩn xác, rõ ràng, lịch sự và tự nhiên. Câu trả lời phải ngắn gọn dưới 2 câu. Tuyệt đối KHÔNG dùng từ lóng hay từ địa phương như tui, nghen, nè, hồng biết. KHÔNG dùng dấu sao (*), gạch đầu dòng hay ký tự đặc biệt.";
 
 const chat = document.getElementById("chat");
@@ -428,21 +428,32 @@ function toggleMenu() {
 async function fetchWithRetry(url, payload, maxRetries = 1, delayMs = 1500) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
-            const response = await fetch(`${url}?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(url, {
                 method: "POST",
-                headers: { 
-                    "Content-Type": "application/json"
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": GEMINI_API_KEY
                 },
                 body: JSON.stringify(payload)
             });
+
             const data = await response.json();
-            if (response.ok) return { ok: true, data };
-            
+
+            if (response.ok) {
+                return { ok: true, data };
+            }
+
             if (attempt < maxRetries && response.status === 429) {
                 await new Promise(res => setTimeout(res, delayMs));
                 continue;
             }
-            return { ok: false, data, status: response.status };
+
+            return {
+                ok: false,
+                data,
+                status: response.status
+            };
+
         } catch (err) {
             if (attempt === maxRetries) throw err;
             await new Promise(res => setTimeout(res, delayMs));
