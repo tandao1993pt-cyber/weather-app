@@ -58,7 +58,7 @@
     .beaufort-tag { background: rgba(2, 132, 199, 0.25); color: #38bdf8; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 
     /* Tiêu Đề Mục */
-    .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+    .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .section-subtitle { font-size: 10px; color: #94a3b8; font-weight: 500; }
 
     /* Cuộn Dự Báo Ngắn Hạn */
@@ -78,6 +78,41 @@
     .station-val { text-align: right; }
     .station-speed { font-size: 14px; font-weight: 700; color: #ffffff; }
     .station-status { font-size: 11px; color: #38bdf8; font-weight: 600; }
+
+    /* Thiết Kế Bản Đồ Gió Tối Giản, Hiện Đại */
+    .map-card-container {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #000;
+    }
+    .map-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .map-tag-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .map-footer-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 8px;
+      padding: 0 4px;
+    }
   </style>
 </head>
 <body>
@@ -168,6 +203,29 @@
       <div class="forecast-scroll" id="forecastScroll"></div>
     </div>
 
+    <!-- CARD BẢN ĐỒ LÔNG CHIM GIÓ (WIND BARBS MAP) -->
+    <div class="card">
+      <div class="section-title">
+        <span style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: #ef4444; font-weight: 800;">PTStormWatch</span> ✕ BẢN ĐỒ GIÓ
+        </span>
+        <span class="map-tag-badge">ECMWF REAL-TIME</span>
+      </div>
+      
+      <div class="map-card-container">
+        <iframe 
+          class="map-iframe"
+          src="https://embed.windy.com/embed2.html?lat=10.930&lon=108.100&detailLat=10.930&detailLon=108.100&width=100%25&height=100%25&zoom=8&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1&useBarbs=true"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="map-footer-info">
+        <span>📍 Tọa độ: Phan Thiết (10.93°N, 108.10°E)</span>
+        <span>Zoom: 8x</span>
+      </div>
+    </div>
+
     <!-- Station System -->
     <div class="card">
       <div class="section-title">
@@ -241,11 +299,10 @@
         const data = await response.json();
         const current = data.current;
 
-        // CẮT CHUỖI LẤY GIỜ TRÒN ĐỂ ĐỒNG BỘ CHÍNH XÁC VỚI MẢNG HOURLY (VD: "2026-08-19T14:25" -> "2026-08-19T14:00")
+        // Cắt chuỗi đồng bộ giờ tròn
         const currentHourISO = current.time.slice(0, 13) + ":00";
         let startIndex = data.hourly.time.indexOf(currentHourISO);
 
-        // Dự phòng trường hợp không khớp chuỗi
         if (startIndex === -1) {
           const nowMs = new Date(current.time).getTime();
           startIndex = data.hourly.time.findIndex(t => new Date(t).getTime() >= nowMs);
@@ -259,11 +316,9 @@
         document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
         document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
         
-        // Khả năng mưa chính xác khung giờ hiện tại
         const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
         const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
         
-        // Hiển thị % mưa kèm lượng mưa mm nếu có
         document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
 
         document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
@@ -285,7 +340,6 @@
         document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
         document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
 
-        // Render dự báo 6 giờ tiếp theo tính từ đúng giờ hiện tại
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
 
@@ -324,4 +378,5 @@
     setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-</html>
+      </html>
+            
