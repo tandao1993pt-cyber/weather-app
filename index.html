@@ -79,15 +79,15 @@
     .station-speed { font-size: 14px; font-weight: 700; color: #ffffff; }
     .station-status { font-size: 11px; color: #38bdf8; font-weight: 600; }
 
-    /* Thiết Kế Bản Đồ Gió Tối Giản, Hiện Đại */
+    /* Thiết Kế Bản Đồ Gió & Áp Suất Tối Giản */
     .map-card-container {
       position: relative;
       width: 100%;
-      height: 380px;
-      border-radius: 14px;
+      height: 420px;
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #0b0f19;
     }
     .map-iframe {
       width: 100%;
@@ -99,7 +99,7 @@
       background: rgba(56, 189, 248, 0.15);
       color: #38bdf8;
       font-size: 10px;
-      padding: 3px 8px;
+      padding: 2px 8px;
       border-radius: 6px;
       font-weight: 700;
       border: 1px solid rgba(56, 189, 248, 0.25);
@@ -110,8 +110,8 @@
       align-items: center;
       font-size: 11px;
       color: #94a3b8;
-      margin-top: 8px;
-      padding: 0 4px;
+      margin-top: 10px;
+      padding: 0 2px;
     }
   </style>
 </head>
@@ -203,26 +203,28 @@
       <div class="forecast-scroll" id="forecastScroll"></div>
     </div>
 
-    <!-- CARD BẢN ĐỒ LÔNG CHIM GIÓ (WIND BARBS MAP) -->
+    <!-- CARD BẢN ĐỒ DỰ BÁO TỔNG HỢP (GIÓ & ÁP SUẤT VIỆT NAM) -->
     <div class="card">
       <div class="section-title">
         <span style="display: flex; align-items: center; gap: 6px;">
-          <span style="color: #ef4444; font-weight: 800;">PTStormWatch</span> ✕ BẢN ĐỒ GIÓ
+          <span style="color: #ef4444; font-weight: 800;">PTSTORM WATCH</span>
+          <span style="color: #64748b; font-size: 11px;">✕</span>
+          <span style="color: #38bdf8; font-weight: 800;">SYNOPTIC VN</span>
         </span>
-        <span class="map-tag-badge">ECMWF REAL-TIME</span>
+        <span class="map-tag-badge">TOÀN CẢNH VIỆT NAM</span>
       </div>
       
       <div class="map-card-container">
         <iframe 
           class="map-iframe"
-          src="https://embed.windy.com/embed2.html?lat=10.930&lon=108.100&detailLat=10.930&detailLon=108.100&width=100%25&height=100%25&zoom=8&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1&useBarbs=true"
+          src="https://embed.windy.com/embed2.html?lat=15.800&lon=107.800&detailLat=10.930&detailLon=108.100&width=100%25&height=100%25&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1&useBarbs=true"
           allowfullscreen>
         </iframe>
       </div>
 
       <div class="map-footer-info">
-        <span>📍 Tọa độ: Phan Thiết (10.93°N, 108.10°E)</span>
-        <span>Zoom: 8x</span>
+        <span>🚩 Lớp hiển thị: Lông chim gió + Đường đẳng áp (hPa)</span>
+        <span>Phạm vi: Cả nước & Biển Đông</span>
       </div>
     </div>
 
@@ -299,7 +301,6 @@
         const data = await response.json();
         const current = data.current;
 
-        // Cắt chuỗi đồng bộ giờ tròn
         const currentHourISO = current.time.slice(0, 13) + ":00";
         let startIndex = data.hourly.time.indexOf(currentHourISO);
 
@@ -378,5 +379,4 @@
     setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-      </html>
-            
+</html>
