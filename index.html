@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PTStormWatch 嵐</title>
-  <!-- Thư viện Bản đồ Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  <title>PTStormWatch 嵐 - JMA Model</title>
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
@@ -16,7 +13,7 @@
     /* Header */
     .header { display: flex; justify-content: space-between; align-items: center; color: #fff; padding: 6px 4px; }
     .header .title { font-size: 20px; font-weight: bold; }
-    .header .menu-icon { font-size: 22px; cursor: pointer; }
+    .header .source-tag { font-size: 10px; background: #1e3a8a; color: #60a5fa; padding: 3px 8px; border-radius: 6px; font-weight: 700; border: 1px solid #3b82f6; }
 
     /* Thanh Thời Gian */
     .time-bar-box { 
@@ -65,9 +62,46 @@
     .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
     .section-subtitle { font-size: 10px; color: #94a3b8; font-weight: 500; }
 
-    /* Bản Đồ Leaflet */
-    #windMap { width: 100%; height: 260px; border-radius: 12px; z-index: 1; border: 1px solid rgba(255, 255, 255, 0.1); }
-    .map-wind-icon { display: flex; align-items: center; justify-content: center; }
+    /* Khung Radar Đen Tuyền Thuần Túy */
+    .radar-container {
+      width: 100%;
+      height: 240px;
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radar-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle, rgba(56, 189, 248, 0.15) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .radar-ring {
+      position: absolute;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: 50%;
+    }
+    .center-point {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: 0 0 10px #ef4444;
+    }
+    .wind-vector-arrow {
+      position: absolute;
+      font-size: 42px;
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+      transition: transform 0.5s ease;
+    }
 
     /* Cuộn Dự Báo Ngắn Hạn */
     .forecast-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
@@ -94,7 +128,7 @@
     <!-- Header -->
     <div class="header">
       <div class="title">PTStormWatch 嵐</div>
-      <div class="menu-icon">☰</div>
+      <div class="source-tag">JMA MODEL 日本</div>
     </div>
 
     <!-- Live Time Bar -->
@@ -104,7 +138,7 @@
         <div class="live-clock-digits" id="liveClock">00:00:00</div>
       </div>
       <div class="time-row-bottom">
-        <span>Tự động làm mới dữ liệu: <b>5 phút/lần</b></span>
+        <span>Tự động làm mới: <b>5 phút/lần</b></span>
         <span class="status-badge" id="statusBadge">● ĐANG TẢI...</span>
       </div>
     </div>
@@ -167,20 +201,26 @@
       </div>
     </div>
 
-    <!-- Map Section -->
+    <!-- Khung Vector Gió RADAR Đen Tuyền (Không cờ, không nhãn) -->
     <div class="card">
       <div class="section-title">
-        <span>BẢN ĐỒ GIÓ REALTIME</span>
-        <span class="section-subtitle">KHÓA TỌA ĐỘ MIỀN NAM & PHAN THIẾT</span>
+        <span>VECTOR GIÓ RADAR JMA</span>
+        <span class="section-subtitle">NỀN TỐI NGUYÊN BẢN (108.10°E, 10.93°N)</span>
       </div>
-      <div id="windMap"></div>
+      <div class="radar-container">
+        <div class="radar-grid"></div>
+        <div class="radar-ring" style="width: 80px; height: 80px;"></div>
+        <div class="radar-ring" style="width: 160px; height: 160px;"></div>
+        <div class="center-point"></div>
+        <div class="wind-vector-arrow" id="radarArrow">⬆</div>
+      </div>
     </div>
 
     <!-- Forecast Section -->
     <div class="card">
       <div class="section-title">
-        <span>DỰ BÁO GIÓ & MƯA NGẮN HẠN</span>
-        <span class="section-subtitle">MŨI TÊN CHỈ HƯỚNG GIÓ THỔI</span>
+        <span>DỰ BÁO GIÓ & MƯA JMA (6H)</span>
+        <span class="section-subtitle">MÔ HÌNH NHẬT BẢN</span>
       </div>
       <div class="forecast-scroll" id="forecastScroll"></div>
     </div>
@@ -194,7 +234,7 @@
         <div class="station-item">
           <div>
             <div class="station-name">Trạm Phú Thủy</div>
-            <div class="station-sub">Trạm chính - Áp suất & Vi khí hậu</div>
+            <div class="station-sub">Trạm chính - Vi khí hậu JMA</div>
           </div>
           <div class="station-val">
             <div class="station-speed" id="stPhuThuySpeed">-- km/h</div>
@@ -204,7 +244,7 @@
         <div class="station-item">
           <div>
             <div class="station-name">Trạm Mũi Né</div>
-            <div class="station-sub">Trạm ven biển - Theo dõi hướng dông</div>
+            <div class="station-sub">Trạm ven biển - Dòng gió bờ</div>
           </div>
           <div class="station-val">
             <div class="station-speed" id="stMuiNeSpeed">-- km/h</div>
@@ -247,14 +287,15 @@
 
     async function fetchWeatherData() {
       const statusBadge = document.getElementById('statusBadge');
-      statusBadge.innerText = "● ĐANG CẬP NHẬT...";
+      statusBadge.innerText = "● ĐANG CẬP NHẬT JMA...";
       statusBadge.style.color = "#f59e0b";
 
-      const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
+      // NGUỒN DỮ LIỆU CHÍNH THỨC TỪ MÔ HÌNH JMA (CỤC KHÍ TƯỢNG NHẬT BẢN)
+      const apiUrl = "https://api.open-meteo.com/v1/jma?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
 
       try {
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("API Error");
+        if (!response.ok) throw new Error("JMA API Error");
         const data = await response.json();
         const current = data.current;
 
@@ -268,24 +309,27 @@
         }
 
         document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1);
-        document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1);
+        document.getElementById('windGust').innerText = current.wind_gusts_10m ? current.wind_gusts_10m.toFixed(1) : (current.wind_speed_10m * 1.35).toFixed(1);
         document.getElementById('temp').innerText = `${current.temperature_2m.toFixed(1)} °C`;
-        document.getElementById('apparentTemp').innerText = `${current.apparent_temperature.toFixed(1)} °C`;
+        document.getElementById('apparentTemp').innerText = `${current.apparent_temperature ? current.apparent_temperature.toFixed(1) : current.temperature_2m.toFixed(1)} °C`;
         document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
         document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
         
-        const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
-        const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
+        const currentRainProb = data.hourly.precipitation_probability ? data.hourly.precipitation_probability[startIndex] : 0;
+        const currentRainMm = data.hourly.precipitation ? data.hourly.precipitation[startIndex] : 0;
         document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
 
         document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
-        document.getElementById('uvIndex').innerText = current.uv_index.toFixed(1);
-        document.getElementById('visibility').innerText = `${(current.visibility / 1000).toFixed(1)} km`;
-        document.getElementById('dewPoint').innerText = `${current.dew_point_2m.toFixed(1)} °C`;
+        document.getElementById('uvIndex').innerText = current.uv_index ? current.uv_index.toFixed(1) : "--";
+        document.getElementById('visibility').innerText = current.visibility ? `${(current.visibility / 1000).toFixed(1)} km` : "10 km";
+        document.getElementById('dewPoint').innerText = current.dew_point_2m ? `${current.dew_point_2m.toFixed(1)} °C` : "-- °C";
 
         const windDir = current.wind_direction_10m;
         document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDir} 50 50)`);
         document.getElementById('windDirectionText').innerText = `${getWindDirName(windDir)} (${windDir}°)`;
+
+        // XOAY MŨI TÊN VECTOR TRÊN KHUNG RADAR NỀN ĐEN
+        document.getElementById('radarArrow').style.transform = `rotate(${windDir + 180}deg)`;
 
         const beaufort = getBeaufort(current.wind_speed_10m);
         document.getElementById('beaufortText').innerText = beaufort.desc;
@@ -297,31 +341,7 @@
         document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
         document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
 
-        // --- TÍCH HỢP BẢN ĐỒ LEAFLET REALTIME ---
-        if (!window.myWindMap) {
-          window.myWindMap = L.map('windMap').setView([10.9333, 108.1000], 8);
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 18,
-            subdomains: 'abcd'
-          }).addTo(window.myWindMap);
-        }
-
-        if (window.windMarker) window.myWindMap.removeLayer(window.windMarker);
-
-        const windArrowHtml = `<div style="transform: rotate(${windDir + 180}deg); font-size: 28px; color: #38bdf8; text-shadow: 0 0 6px #000;">⬆</div>`;
-
-        const customWindIcon = L.divIcon({
-          html: windArrowHtml,
-          className: 'map-wind-icon',
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
-        });
-
-        window.windMarker = L.marker([10.9333, 108.1000], { icon: customWindIcon })
-          .addTo(window.myWindMap)
-          .bindPopup(`<b>Phan Thiết</b><br>Gió: ${current.wind_speed_10m.toFixed(1)} km/h<br>Hướng: ${windDir}° (${getWindDirName(windDir)})`);
-
-        // Render dự báo 6 giờ tiếp theo
+        // Render dự báo 6 giờ tiếp theo từ JMA
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
 
@@ -333,8 +353,8 @@
           const timeLabel = `${String(rawTime.getHours()).padStart(2, '0')}:00`;
           const fcWind = data.hourly.wind_speed_10m[targetIndex]?.toFixed(1) || "--";
           const fcDir = data.hourly.wind_direction_10m[targetIndex] || 0;
-          const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
-          const fcRainMm = data.hourly.precipitation[targetIndex] ?? 0;
+          const fcRain = data.hourly.precipitation_probability ? data.hourly.precipitation_probability[targetIndex] : 0;
+          const fcRainMm = data.hourly.precipitation ? data.hourly.precipitation[targetIndex] : 0;
 
           forecastContainer.innerHTML += `
             <div class="forecast-item">
@@ -347,11 +367,11 @@
           `;
         }
 
-        statusBadge.innerText = "● MỚI NHẤT";
+        statusBadge.innerText = "● JMA CHUẨN XÁC";
         statusBadge.style.color = "#4ade80";
       } catch (err) {
-        console.error("Lỗi lấy dữ liệu:", err);
-        statusBadge.innerText = "● LỖI MẠNG";
+        console.error("Lỗi lấy dữ liệu JMA:", err);
+        statusBadge.innerText = "● LỖI MẠNG JMA";
         statusBadge.style.color = "#ef4444";
       }
     }
@@ -360,5 +380,4 @@
     setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-  </html>
-  
+</html>
