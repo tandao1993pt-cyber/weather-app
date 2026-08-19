@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PTStormWatch 嵐</title>
+  <!-- Thư viện Bản đồ Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
@@ -61,6 +65,10 @@
     .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
     .section-subtitle { font-size: 10px; color: #94a3b8; font-weight: 500; }
 
+    /* Bản Đồ Leaflet */
+    #windMap { width: 100%; height: 260px; border-radius: 12px; z-index: 1; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .map-wind-icon { display: flex; align-items: center; justify-content: center; }
+
     /* Cuộn Dự Báo Ngắn Hạn */
     .forecast-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .forecast-item { min-width: 76px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 4px; text-align: center; flex-shrink: 0; }
@@ -78,25 +86,6 @@
     .station-val { text-align: right; }
     .station-speed { font-size: 14px; font-weight: 700; color: #ffffff; }
     .station-status { font-size: 11px; color: #38bdf8; font-weight: 600; }
-
-    /* Nút Chuyển Bản Đồ Gió Nhật Bản */
-    .jp-tab-btn {
-      background: rgba(255, 255, 255, 0.04);
-      color: #94a3b8;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .jp-tab-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #38bdf8;
-    }
   </style>
 </head>
 <body>
@@ -178,6 +167,15 @@
       </div>
     </div>
 
+    <!-- Map Section -->
+    <div class="card">
+      <div class="section-title">
+        <span>BẢN ĐỒ GIÓ REALTIME</span>
+        <span class="section-subtitle">KHÓA TỌA ĐỘ MIỀN NAM & PHAN THIẾT</span>
+      </div>
+      <div id="windMap"></div>
+    </div>
+
     <!-- Forecast Section -->
     <div class="card">
       <div class="section-title">
@@ -215,27 +213,6 @@
         </div>
       </div>
     </div>
-
-    <!-- BẢN ĐỒ GIÓ NHẬT BẢN 4 NGUỒN CHUYÊN SÂU -->
-    <div class="card">
-      <div class="section-title">
-        <span>BẢN ĐỒ GIÓ NHẬT BẢN (4 NGUỒN CHUYÊN SÂU)</span>
-        <span class="section-subtitle">ẤN ĐỂ CHUYỂN BẢN ĐỒ SO SÁNH</span>
-      </div>
-
-      <!-- Thanh chọn 4 nguồn web -->
-      <div style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px;">
-        <button class="jp-tab-btn active" onclick="changeJpWindMap(0, 'https://www.jma.go.jp/bosai/map/#contents=wind')">1. JMA Khí Tượng</button>
-        <button class="jp-tab-btn" onclick="changeJpWindMap(1, 'https://weathernews.jp/onebox/radar/wind/')">2. Weathernews JP</button>
-        <button class="jp-tab-btn" onclick="changeJpWindMap(2, 'https://weather.yahoo.co.jp/weather/zoomradar/wind/')">3. Yahoo! Japan</button>
-        <button class="jp-tab-btn" onclick="changeJpWindMap(3, 'https://supercwc.com/')">4. SCW Japan Wind</button>
-      </div>
-
-      <!-- Khung hiển thị bản đồ -->
-      <div style="width: 100%; height: 420px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: #0f172a;">
-        <iframe id="jpWindFrame" src="https://www.jma.go.jp/bosai/map/#contents=wind" style="width: 100%; height: 100%; border: none;"></iframe>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -268,18 +245,6 @@
       return { level: 10, desc: "10/12 Bão mạnh" };
     }
 
-    function changeJpWindMap(btnIndex, mapUrl) {
-      const buttons = document.querySelectorAll('.jp-tab-btn');
-      buttons.forEach((btn, idx) => {
-        if (idx === btnIndex) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      document.getElementById('jpWindFrame').src = mapUrl;
-    }
-
     async function fetchWeatherData() {
       const statusBadge = document.getElementById('statusBadge');
       statusBadge.innerText = "● ĐANG CẬP NHẬT...";
@@ -293,11 +258,9 @@
         const data = await response.json();
         const current = data.current;
 
-        // CẮT CHUỖI LẤY GIỜ TRÒN ĐỂ ĐỒNG BỘ CHÍNH XÁC VỚI MẢNG HOURLY (VD: "2026-08-19T14:25" -> "2026-08-19T14:00")
         const currentHourISO = current.time.slice(0, 13) + ":00";
         let startIndex = data.hourly.time.indexOf(currentHourISO);
 
-        // Dự phòng trường hợp không khớp chuỗi
         if (startIndex === -1) {
           const nowMs = new Date(current.time).getTime();
           startIndex = data.hourly.time.findIndex(t => new Date(t).getTime() >= nowMs);
@@ -311,11 +274,8 @@
         document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
         document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
         
-        // Khả năng mưa chính xác khung giờ hiện tại
         const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
         const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
-        
-        // Hiển thị % mưa kèm lượng mưa mm nếu có
         document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
 
         document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
@@ -337,7 +297,31 @@
         document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
         document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
 
-        // Render dự báo 6 giờ tiếp theo tính từ đúng giờ hiện tại
+        // --- TÍCH HỢP BẢN ĐỒ LEAFLET REALTIME ---
+        if (!window.myWindMap) {
+          window.myWindMap = L.map('windMap').setView([10.9333, 108.1000], 8);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 18,
+            subdomains: 'abcd'
+          }).addTo(window.myWindMap);
+        }
+
+        if (window.windMarker) window.myWindMap.removeLayer(window.windMarker);
+
+        const windArrowHtml = `<div style="transform: rotate(${windDir + 180}deg); font-size: 28px; color: #38bdf8; text-shadow: 0 0 6px #000;">⬆</div>`;
+
+        const customWindIcon = L.divIcon({
+          html: windArrowHtml,
+          className: 'map-wind-icon',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        window.windMarker = L.marker([10.9333, 108.1000], { icon: customWindIcon })
+          .addTo(window.myWindMap)
+          .bindPopup(`<b>Phan Thiết</b><br>Gió: ${current.wind_speed_10m.toFixed(1)} km/h<br>Hướng: ${windDir}° (${getWindDirName(windDir)})`);
+
+        // Render dự báo 6 giờ tiếp theo
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
 
@@ -376,5 +360,5 @@
     setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-</html>
+  </html>
   
