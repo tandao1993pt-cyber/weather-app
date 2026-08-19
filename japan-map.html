@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao Diện Bản Đồ</title>
+    
+    <!-- Dán các link thư viện CSS (Leaflet, Windy...) của bên Nhật Bản ở đây -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body, #map { width: 100%; height: 100vh; background: #0f172a; }
+
+        /* DÁN CSS GIAO DIỆN CỦA BÊN NHẬT BẢN VÀO ĐÂY */
+    </style>
+</head>
+<body>
+
+    <!-- Khung chứa bản đồ/giao diện chính -->
+    <div id="map"></div>
+
+    <!-- Dán các link thư viện JS của bên Nhật Bản ở đây -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // =======================================================
+        // 1. DÁN MÃ CODE JAVASCRIPT BẢN ĐỒ CỦA BÊN NHẬT BẢN VÀO ĐÂY
+        // =======================================================
+        
+
+
+
+        // =======================================================
+        // 2. CẦU NÓI TỰ ĐỘNG NÓI CHUYỆN VỚI INDEX.HTML (GIỮ NGUYÊN)
+        // =======================================================
+        // Tự động phát tín hiệu báo cho index.html ngay khi tải xong
+        window.addEventListener("load", function() {
+            window.parent.postMessage("BAN_DO_DA_SS", "*");
+        });
+
+        // Lắng nghe các lệnh gửi từ index.html truyền sang
+        window.addEventListener("message", function(event) {
+            console.log("Lệnh từ trang chính gửi sang:", event.data);
+        });
+    </script>
+</body>
+</html>
