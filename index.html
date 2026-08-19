@@ -4,16 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PTStormWatch 嵐</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
     .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
     
+    /* Header */
     .header { display: flex; justify-content: space-between; align-items: center; color: #fff; padding: 6px 4px; }
     .header .title { font-size: 20px; font-weight: bold; }
     .header .menu-icon { font-size: 22px; cursor: pointer; }
 
+    /* Thanh Thời Gian */
     .time-bar-box { 
       background: rgba(30, 41, 59, 0.7); 
       backdrop-filter: blur(12px);
@@ -29,6 +30,7 @@
     .time-row-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 6px; }
     .status-badge { background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
+    /* Khung Thẻ Chính */
     .card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
     .location-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .location-title { font-size: 22px; font-weight: 700; color: #ffffff; }
@@ -38,23 +40,28 @@
     .wind-speed-unit { font-size: 16px; font-weight: 600; color: #94a3b8; }
     .wind-gust { font-size: 13px; color: #94a3b8; margin-bottom: 2px; }
     
+    /* Dẫn Hướng La Bàn */
     .compass-box { width: 85px; height: 85px; position: relative; }
 
+    /* Lưới Thông Số 9 ô */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
     .grid-item { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 6px; text-align: center; }
     .grid-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 500; }
     .grid-value { font-size: 15px; font-weight: 700; color: #ffffff; }
     .highlight-rain { color: #38bdf8; }
 
+    /* Hướng Gió */
     .wind-info-box { border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
     .info-row { display: flex; justify-content: space-between; font-size: 13px; }
     .info-label { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px; }
     .info-val { font-weight: 700; color: #ffffff; }
     .beaufort-tag { background: rgba(2, 132, 199, 0.25); color: #38bdf8; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 
+    /* Tiêu Đề Mục */
     .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
     .section-subtitle { font-size: 10px; color: #94a3b8; font-weight: 500; }
 
+    /* Cuộn Dự Báo Ngắn Hạn */
     .forecast-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .forecast-item { min-width: 76px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 4px; text-align: center; flex-shrink: 0; }
     .fc-time { font-size: 12px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px; }
@@ -63,16 +70,7 @@
     .fc-dir { font-size: 10px; color: #94a3b8; }
     .fc-rain { font-size: 11px; color: #38bdf8; font-weight: 600; margin-top: 2px; }
 
-    .map-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 12px; }
-    #map { width: 100%; height: 380px; border-radius: 12px; background: #0b0f19; z-index: 1; }
-    .time-control-box { background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06); display: flex; flex-direction: column; gap: 8px; }
-    .control-row-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-    .time-display { font-weight: bold; color: #38bdf8; font-family: monospace; font-size: 14px; }
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    .play-btn { background: #0284c7; color: white; border: none; border-radius: 8px; width: 36px; height: 36px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .time-slider { flex: 1; accent-color: #38bdf8; cursor: pointer; height: 6px; }
-    .source-tag { font-size: 10px; color: #94a3b8; text-align: right; }
-
+    /* Trạm Thực Địa */
     .station-list { display: flex; flex-direction: column; gap: 8px; }
     .station-item { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
     .station-name { font-size: 13px; font-weight: 700; color: #ffffff; }
@@ -85,11 +83,13 @@
 <body>
 
   <div class="app-container">
+    <!-- Header -->
     <div class="header">
       <div class="title">PTStormWatch 嵐</div>
       <div class="menu-icon">☰</div>
     </div>
 
+    <!-- Live Time Bar -->
     <div class="time-bar-box">
       <div class="time-row-top">
         <span id="liveDate">Đang tải ngày...</span>
@@ -101,6 +101,7 @@
       </div>
     </div>
 
+    <!-- Main Card -->
     <div class="card">
       <div class="location-header">
         <div class="location-title">Phan Thiết ✎</div>
@@ -132,6 +133,7 @@
         </div>
       </div>
 
+      <!-- Detail Grid (9 ô) -->
       <div class="grid-container">
         <div class="grid-item"><div class="grid-label">Nhiệt độ</div><div class="grid-value" id="temp">-- °C</div></div>
         <div class="grid-item"><div class="grid-label">Cảm nhận</div><div class="grid-value" id="apparentTemp">-- °C</div></div>
@@ -144,6 +146,7 @@
         <div class="grid-item"><div class="grid-label">Điểm sương</div><div class="grid-value" id="dewPoint">-- °C</div></div>
       </div>
 
+      <!-- Info Box -->
       <div class="wind-info-box">
         <div class="info-row">
           <span class="info-label">Phương hướng gió</span>
@@ -156,6 +159,7 @@
       </div>
     </div>
 
+    <!-- Forecast Section -->
     <div class="card">
       <div class="section-title">
         <span>DỰ BÁO GIÓ & MƯA NGẮN HẠN</span>
@@ -164,25 +168,7 @@
       <div class="forecast-scroll" id="forecastScroll"></div>
     </div>
 
-    <div class="map-card">
-      <div class="section-title">
-        <span>BẢN ĐỒ MÂY DÔNG & RADAR</span>
-        <span class="section-subtitle">PHẠM VI MIỀN NAM</span>
-      </div>
-      <div id="map"></div>
-      <div class="time-control-box">
-        <div class="control-row-top">
-          <span style="color: #94a3b8;">Thời gian quan trắc:</span>
-          <span class="time-display" id="mapTimeLabel">Đang tải dữ liệu...</span>
-        </div>
-        <div class="slider-row">
-          <button class="play-btn" id="mapPlayBtn" onclick="toggleMapPlay()">▶</button>
-          <input type="range" class="time-slider" id="mapTimeSlider" min="0" max="0" value="0" oninput="onMapSliderChange(this.value)">
-        </div>
-        <div class="source-tag">Vệ tinh Himawari-9 & Radar • Cập nhật tự động</div>
-      </div>
-    </div>
-
+    <!-- Station System -->
     <div class="card">
       <div class="section-title">
         <span>HỆ THỐNG TRẠM THỰC ĐỊA</span>
@@ -212,154 +198,141 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      
-      // 1. Đồng hồ thời gian thực
-      function updateLiveTime() {
-        try {
-          const now = new Date();
-          const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-          const liveDateEl = document.getElementById('liveDate');
-          const liveClockEl = document.getElementById('liveClock');
-          if (liveDateEl) liveDateEl.innerText = days[now.getDay()] + ', ' + String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-          if (liveClockEl) liveClockEl.innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
-        } catch(e) { console.error("Lỗi đồng hồ:", e); }
-      }
-      setInterval(updateLiveTime, 1000);
-      updateLiveTime();
+    function updateLiveTime() {
+      const now = new Date();
+      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      document.getElementById('liveDate').innerText = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      document.getElementById('liveClock').innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    }
+    setInterval(updateLiveTime, 1000);
+    updateLiveTime();
 
-      // 2. Hàm hỗ trợ thời tiết
-      function getWindDirName(deg) {
-        const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-        return dirs[Math.round(deg / 22.5) % 16];
-      }
+    function getWindDirName(deg) {
+      const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      const index = Math.round(deg / 22.5) % 16;
+      return dirs[index];
+    }
 
-      function getBeaufort(speedKmH) {
-        if (speedKmH < 2) return { level: 0, desc: "0/12 Lặng gió" };
-        if (speedKmH <= 5) return { level: 1, desc: "1/12 Gió nhẹ" };
-        if (speedKmH <= 11) return { level: 2, desc: "2/12 Gió nhẹ" };
-        if (speedKmH <= 19) return { level: 3, desc: "3/12 Gió yếu" };
-        if (speedKmH <= 28) return { level: 4, desc: "4/12 Gió vừa phải" };
-        if (speedKmH <= 38) return { level: 5, desc: "5/12 Gió khá mạnh" };
-        if (speedKmH <= 49) return { level: 6, desc: "6/12 Gió mạnh" };
-        if (speedKmH <= 61) return { level: 7, desc: "7/12 Gió rất mạnh" };
-        if (speedKmH <= 74) return { level: 8, desc: "8/12 Gió giật" };
-        if (speedKmH <= 88) return { level: 9, desc: "9/12 Gió rất giật" };
-        return { level: 10, desc: "10/12 Bão mạnh" };
-      }
+    function getBeaufort(speedKmH) {
+      if (speedKmH < 2) return { level: 0, desc: "0/12 Lặng gió" };
+      if (speedKmH <= 5) return { level: 1, desc: "1/12 Gió nhẹ" };
+      if (speedKmH <= 11) return { level: 2, desc: "2/12 Gió nhẹ" };
+      if (speedKmH <= 19) return { level: 3, desc: "3/12 Gió yếu" };
+      if (speedKmH <= 28) return { level: 4, desc: "4/12 Gió vừa phải" };
+      if (speedKmH <= 38) return { level: 5, desc: "5/12 Gió khá mạnh" };
+      if (speedKmH <= 49) return { level: 6, desc: "6/12 Gió mạnh" };
+      if (speedKmH <= 61) return { level: 7, desc: "7/12 Gió rất mạnh" };
+      if (speedKmH <= 74) return { level: 8, desc: "8/12 Gió giật" };
+      if (speedKmH <= 88) return { level: 9, desc: "9/12 Gió rất giật" };
+      return { level: 10, desc: "10/12 Bão mạnh" };
+    }
 
-      // 3. Lấy dữ liệu thời tiết
-      async function fetchWeatherData() {
-        const statusBadge = document.getElementById('statusBadge');
-        if (statusBadge) {
-          statusBadge.innerText = "● ĐANG CẬP NHẬT...";
-          statusBadge.style.color = "#f59e0b";
-        }
+    async function fetchWeatherData() {
+      const statusBadge = document.getElementById('statusBadge');
+      statusBadge.innerText = "● ĐANG CẬP NHẬT...";
+      statusBadge.style.color = "#f59e0b";
 
-        const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
+      const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
 
-        try {
-          const response = await fetch(apiUrl);
-          if (!response.ok) throw new Error("API Error");
-          const data = await response.json();
-          const current = data.current;
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("API Error");
+        const data = await response.json();
+        const current = data.current;
 
-          const currentHourISO = current.time.slice(0, 13) + ":00";
-          let startIndex = data.hourly.time.indexOf(currentHourISO);
+        const currentHourISO = current.time.slice(0, 13) + ":00";
+        let startIndex = data.hourly.time.indexOf(currentHourISO);
+
+        if (startIndex === -1) {
+          const nowMs = new Date(current.time).getTime();
+          startIndex = data.hourly.time.findIndex(t => new Date(t).getTime() >= nowMs);
           if (startIndex === -1) startIndex = 0;
-
-          document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1);
-          document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1);
-          document.getElementById('temp').innerText = current.temperature_2m.toFixed(1) + " °C";
-          document.getElementById('apparentTemp').innerText = current.apparent_temperature.toFixed(1) + " °C";
-          document.getElementById('humidity').innerText = current.relative_humidity_2m + " %";
-          document.getElementById('pressure').innerText = Math.round(current.surface_pressure) + " hPa";
-          
-          const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
-          const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
-          document.getElementById('pop').innerText = currentRainMm > 0 ? (currentRainProb + "% (" + currentRainMm + "mm)") : (currentRainProb + " %");
-
-          document.getElementById('cloudCover').innerText = current.cloud_cover + " %";
-          document.getElementById('uvIndex').innerText = current.uv_index.toFixed(1);
-          document.getElementById('visibility').innerText = (current.visibility / 1000).toFixed(1) + " km";
-          document.getElementById('dewPoint').innerText = current.dew_point_2m.toFixed(1) + " °C";
-
-          const windDir = current.wind_direction_10m;
-          document.getElementById('compassNeedle').setAttribute('transform', 'rotate(' + windDir + ' 50 50)');
-          document.getElementById('windDirectionText').innerText = getWindDirName(windDir) + " (" + windDir + "°)";
-
-          const beaufort = getBeaufort(current.wind_speed_10m);
-          document.getElementById('beaufortText').innerText = beaufort.desc;
-
-          document.getElementById('stPhuThuySpeed').innerText = current.wind_speed_10m.toFixed(1) + " km/h";
-          document.getElementById('stPhuThuyStatus').innerText = beaufort.desc;
-
-          const muiNeSpeed = current.wind_speed_10m * 1.12;
-          document.getElementById('stMuiNeSpeed').innerText = muiNeSpeed.toFixed(1) + " km/h";
-          document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
-
-          const forecastContainer = document.getElementById('forecastScroll');
-          forecastContainer.innerHTML = '';
-
-          for (let i = 0; i < 6; i++) {
-            const targetIndex = startIndex + i;
-            if (!data.hourly.time[targetIndex]) break;
-
-            const rawTime = new Date(data.hourly.time[targetIndex]);
-            const timeLabel = String(rawTime.getHours()).padStart(2, '0') + ":00";
-            const fcWind = data.hourly.wind_speed_10m[targetIndex] ? data.hourly.wind_speed_10m[targetIndex].toFixed(1) : "--";
-            const fcDir = data.hourly.wind_direction_10m[targetIndex] || 0;
-            const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
-            const fcRainMm = data.hourly.precipitation[targetIndex] ?? 0;
-
-            forecastContainer.innerHTML += '<div class="forecast-item">' +
-              '<div class="fc-time">' + timeLabel + '</div>' +
-              '<div class="fc-icon" style="transform: rotate(' + (fcDir + 180) + 'deg); display: inline-block;">⬆</div>' +
-              '<div class="fc-dir">' + fcDir + '° ' + getWindDirName(fcDir) + '</div>' +
-              '<div class="fc-wind">' + fcWind + ' km/h</div>' +
-              '<div class="fc-rain">🌧 ' + fcRain + '%' + (fcRainMm > 0 ? '<br>(' + fcRainMm + 'mm)' : '') + '</div>' +
-            '</div>';
-          }
-
-          if (statusBadge) {
-            statusBadge.innerText = "● MỚI NHẤT";
-            statusBadge.style.color = "#4ade80";
-          }
-        } catch (err) {
-          console.error("Lỗi lấy dữ liệu:", err);
-          if (statusBadge) {
-            statusBadge.innerText = "● LỖI MẠNG";
-            statusBadge.style.color = "#ef4444";
-          }
         }
+
+        document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1);
+        document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1);
+        document.getElementById('temp').innerText = `${current.temperature_2m.toFixed(1)} °C`;
+        document.getElementById('apparentTemp').innerText = `${current.apparent_temperature.toFixed(1)} °C`;
+        document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
+        document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
+        
+        const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
+        const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
+        
+        document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
+
+        document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
+        document.getElementById('uvIndex').innerText = current.uv_index.toFixed(1);
+        document.getElementById('visibility').innerText = `${(current.visibility / 1000).toFixed(1)} km`;
+        document.getElementById('dewPoint').innerText = `${current.dew_point_2m.toFixed(1)} °C`;
+
+        const windDir = current.wind_direction_10m;
+        document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDir} 50 50)`);
+        document.getElementById('windDirectionText').innerText = `${getWindDirName(windDir)} (${windDir}°)`;
+
+        const beaufort = getBeaufort(current.wind_speed_10m);
+        document.getElementById('beaufortText').innerText = beaufort.desc;
+
+        document.getElementById('stPhuThuySpeed').innerText = `${current.wind_speed_10m.toFixed(1)} km/h`;
+        document.getElementById('stPhuThuyStatus').innerText = beaufort.desc;
+
+        const muiNeSpeed = current.wind_speed_10m * 1.12;
+        document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
+        document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
+
+        const forecastContainer = document.getElementById('forecastScroll');
+        forecastContainer.innerHTML = '';
+
+        for (let i = 0; i < 6; i++) {
+          const targetIndex = startIndex + i;
+          if (!data.hourly.time[targetIndex]) break;
+
+          const rawTime = new Date(data.hourly.time[targetIndex]);
+          const timeLabel = `${String(rawTime.getHours()).padStart(2, '0')}:00`;
+          const fcWind = data.hourly.wind_speed_10m[targetIndex]?.toFixed(1) || "--";
+          const fcDir = data.hourly.wind_direction_10m[targetIndex] || 0;
+          const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
+          const fcRainMm = data.hourly.precipitation[targetIndex] ?? 0;
+
+          forecastContainer.innerHTML += `
+            <div class="forecast-item">
+              <div class="fc-time">${timeLabel}</div>
+              <div class="fc-icon" style="transform: rotate(${fcDir + 180}deg); display: inline-block;">⬆</div>
+              <div class="fc-dir">${fcDir}° ${getWindDirName(fcDir)}</div>
+              <div class="fc-wind">${fcWind} km/h</div>
+              <div class="fc-rain">🌧 ${fcRain}%${fcRainMm > 0 ? `<br>(${fcRainMm}mm)` : ''}</div>
+            </div>
+          `;
+        }
+
+        statusBadge.innerText = "● MỚI NHẤT";
+        statusBadge.style.color = "#4ade80";
+
+        // CẦU NÓI 1: GỬI BÁO CÁO DỮ LIỆU SANG FILE INDEX.HTML
+        window.parent.postMessage({
+          status: "SUCCESS",
+          windSpeed: current.wind_speed_10m.toFixed(1),
+          temp: current.temperature_2m.toFixed(1)
+        }, "*");
+
+      } catch (err) {
+        console.error("Lỗi lấy dữ liệu:", err);
+        statusBadge.innerText = "● LỖI MẠNG";
+        statusBadge.style.color = "#ef4444";
       }
+    }
 
-      fetchWeatherData();
-      setInterval(fetchWeatherData, 300000);
+    fetchWeatherData();
+    setInterval(fetchWeatherData, 300000);
 
-      // 4. Bản đồ Leaflet (An toàn, chống sập trang)
-      let mapObj = null;
-      let radarApiData = null;
-      let radarLayersObj = {};
-      let currentMapIndex = 0;
-      let isMapPlaying = false;
-      let mapPlayInterval = null;
-
-      function initLeafletMap() {
-        if (typeof L === 'undefined') {
-          document.getElementById('mapTimeLabel').innerText = "Không tải được bản đồ";
-          return;
-        }
-
-        try {
-          mapObj = L.map('map', { zoomControl: false }).setView([10.500, 107.000], 7);
-
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 18,
-            attribution: ''
-          }).addTo(mapObj);
-
-      
+    // CẦU NÓI 2: LẮNG NGHE LỆNH TỪ INDEX.HTML (NẾU INDEX YÊU CẦU LÀM MỚI DỮ LIỆU)
+    window.addEventListener("message", function(event) {
+      if (event.data === "REFRESH") {
+        fetchWeatherData();
+      }
+    });
+  </script>
+</body>
+                                                                       </html>
+              
