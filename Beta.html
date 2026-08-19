@@ -3,109 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Bản Đồ Vệ Tinh & Ra-đa Mây Thời Gian Thực</title>
-    
-    <!-- Thư viện bản đồ Leaflet CSS -->
+    <title>Bản đồ thời tiết chuyên nghiệp</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body, #map { width: 100%; height: 100%; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        /* Khung thông tin nổi góc trên màn hình */
-        .info-panel {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            z-index: 1000;
-            background: rgba(15, 23, 42, 0.85);
-            color: #fff;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        .info-panel h4 { margin-bottom: 4px; color: #38bdf8; font-size: 14px; }
-        .info-panel p { color: #cbd5e1; font-size: 12px; }
+        body, html, #map { margin: 0; padding: 0; height: 100%; width: 100%; }
+        /* Ẩn hoàn toàn logo và dòng chữ bản quyền */
+        .leaflet-control-attribution { display: none !important; }
     </style>
 </head>
 <body>
-
-    <!-- Khung hiển thị trạng thái dữ liệu -->
-    <div class="info-panel">
-        <h4>🌧️ Ra-đa & Mây Thời Gian Thực</h4>
-        <p id="status">Đang tải dữ liệu mây mới nhất...</p>
-    </div>
-
-    <!-- Khung chứa bản đồ -->
     <div id="map"></div>
 
-    <!-- Thư viện bản đồ Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. Khởi tạo bản đồ tại tọa độ trung tâm Việt Nam
+        // 1. Khởi tạo bản đồ
         const map = L.map('map', {
-            center: [16.04, 108.2], // Miền Trung Việt Nam
-            zoom: 6,                // Mức xem toàn quốc
-            minZoom: 3,
-            maxZoom: 18
+            center: [16.0, 108.0],
+            zoom: 6,
+            attributionControl: false // Tắt luôn thanh bản quyền
         });
 
-        // 2. Lớp bản đồ nền: Vệ tinh độ phân giải cao của Esri
+        // 2. Lớp bản đồ nền vệ tinh (không chứa logo)
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 18,
-            attribution: 'Tiles &copy; Esri'
+            maxZoom: 18
         }).addTo(map);
 
-        // 3. Lớp nhãn tên tỉnh/thành phố, địa danh
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
-            subdomains: 'abcd',
-            maxZoom: 18,
-            pane: 'shadowPane'
-        }).addTo(map);
-
-        // 4. Tự động kết nối API lấy dữ liệu mây/ra-đa mưa mới nhất
-        let radarLayer;
-
-        async function loadLatestCloudRadar() {
+        // 3. Tự động lấy dữ liệu mây/mưa từ RainViewer
+        async function loadWeather() {
             try {
-                // Gọi API lấy mốc thời gian ảnh ra-đa mới nhất
                 const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await response.json();
-
-                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                    // Lấy hình ảnh mới nhất trong danh sách
-                    const latestFrame = data.radar.past[data.radar.past.length - 1];
-                    const timestamp = latestFrame.time;
-                    const timeString = new Date(timestamp * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-
-                    document.getElementById('status').innerText = 'Cập nhật mây lúc: ' + timeString;
-
-                    // Nếu đã có lớp mây cũ thì xóa để thay lớp mới
-                    if (radarLayer) {
-                        map.removeLayer(radarLayer);
-                    }
-
-                    // Thêm lớp mây/mưa ra-đa đè lên bản đồ vệ tinh (độ trong suốt 70%)
-                    radarLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${timestamp}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.7,
-                        maxZoom: 18
-                    }).addTo(map);
-                }
-            } catch (error) {
-                console.error('Lỗi tải dữ liệu ra-đa:', error);
-                document.getElementById('status').innerText = 'Lỗi kết nối dữ liệu mây.';
+                const latest = data.radar.past[data.radar.past.length - 1];
+                
+                // Thêm lớp mây/mưa vào bản đồ
+                L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${latest.time}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    opacity: 0.7
+                }).addTo(map);
+                
+                console.log("Đã tải dữ liệu thời tiết thành công!");
+            } catch (e) {
+                console.log("Lỗi tải dữ liệu, đang thử lại...");
             }
         }
 
-        // Tải dữ liệu mây ngay khi mở app
-        loadLatestCloudRadar();
-
-        // Tự động làm mới dữ liệu mây mỗi 5 phút
-        setInterval(loadLatestCloudRadar, 5 * 60 * 1000);
+        loadWeather();
     </script>
 </body>
 </html>
-
