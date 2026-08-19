@@ -3,46 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giao Diện Bản Đồ</title>
-    
-    <!-- Dán các link thư viện CSS (Leaflet, Windy...) của bên Nhật Bản ở đây -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+    <title>PTStormWatch - Trạm Quản Lý</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body, #map { width: 100%; height: 100vh; background: #0f172a; }
-
-        /* DÁN CSS GIAO DIỆN CỦA BÊN NHẬT BẢN VÀO ĐÂY */
+        html, body { width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; }
+        #app-frame { width: 100%; height: 100%; border: none; display: block; }
     </style>
 </head>
 <body>
 
-    <!-- Khung chứa bản đồ/giao diện chính -->
-    <div id="map"></div>
-
-    <!-- Dán các link thư viện JS của bên Nhật Bản ở đây -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Gọi file japan-map.html ra chạy riêng trong khung cách ly -->
+    <iframe id="app-frame" src="japan-map.html"></iframe>
 
     <script>
-        // =======================================================
-        // 1. DÁN MÃ CODE JAVASCRIPT BẢN ĐỒ CỦA BÊN NHẬT BẢN VÀO ĐÂY
-        // =======================================================
-        
-
-
-
-        // =======================================================
-        // 2. CẦU NÓI TỰ ĐỘNG NÓI CHUYỆN VỚI INDEX.HTML (GIỮ NGUYÊN)
-        // =======================================================
-        // Tự động phát tín hiệu báo cho index.html ngay khi tải xong
-        window.addEventListener("load", function() {
-            window.parent.postMessage("BAN_DO_DA_SS", "*");
-        });
-
-        // Lắng nghe các lệnh gửi từ index.html truyền sang
+        // Lắng nghe báo cáo dữ liệu gửi về từ file japan-map.html
         window.addEventListener("message", function(event) {
-            console.log("Lệnh từ trang chính gửi sang:", event.data);
+            if (event.data && event.data.status === "SUCCESS") {
+                console.log("Đã nhận dữ liệu từ giao diện Nhật Bản:");
+                console.log("Tốc độ gió:", event.data.windSpeed, "km/h");
+                console.log("Nhiệt độ:", event.data.temp, "°C");
+            }
         });
+
+        // Hàm giúp index.html ra lệnh cho giao diện tự cập nhật lại dữ liệu nếu cần
+        function lamMoiGiaoDien() {
+            var frame = document.getElementById('app-frame');
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage("REFRESH", "*");
+            }
+        }
     </script>
+
 </body>
 </html>
