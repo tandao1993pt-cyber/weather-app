@@ -3,153 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Trạm Giám Sát Thời Tiết Chuyên Nghiệp</title>
+    <title>Bản Đồ Thời Tiết</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html, body, #map { width: 100%; height: 100%; background: #0f172a; overflow: hidden; }
-
-        /* Xóa bỏ hoàn toàn logo và chữ bản quyền chân trang */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body, #map { width: 100%; height: 100%; background: #121212; }
+        
+        /* Xóa sạch dòng chữ bản quyền ở chân trang */
         .leaflet-control-attribution { display: none !important; }
-
-        /* Chuyển các nút zoom chuẩn của Leaflet sang góc phải */
-        .leaflet-top.leaflet-right { top: 12px; right: 12px; }
-        .leaflet-touch .leaflet-bar { border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        .leaflet-touch .leaflet-bar a { background: #1e293b; color: #38bdf8; border-bottom: 1px solid #334155; width: 40px; height: 40px; line-height: 40px; font-size: 20px; font-weight: bold; }
-
-        /* BẢNG ĐIỀU KHIỂN CHÍNH (GÓC TRÁI MÀN HÌNH) */
-        #left-panel {
+        
+        /* Bảng điều khiển góc trái */
+        #control-panel {
             position: absolute;
             top: 12px;
             left: 12px;
             z-index: 1000;
-            width: 280px;
-            max-width: calc(100vw - 80px);
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 12px;
-            padding: 14px;
-            color: #f8fafc;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 12px;
+            border-radius: 10px;
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 200px;
         }
 
-        .panel-title { font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .status-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22c55e; }
-
-        .section-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin: 10px 0 6px 0; font-weight: 600; }
-
-        /* Nút bấm lớn tối ưu cho thao tác vuốt chạm */
-        .btn-group { display: flex; gap: 6px; margin-bottom: 8px; }
         .btn {
-            flex: 1;
-            padding: 10px 8px;
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
             background: #1e293b;
+            color: #94a3b8;
             border: 1px solid #334155;
-            color: #cbd5e1;
-            border-radius: 8px;
+            border-radius: 6px;
+            font-weight: bold;
             font-size: 12px;
-            font-weight: 600;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s ease;
-        }
-        .btn.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
-        .btn:active { transform: scale(0.96); }
-
-        /* Thanh trượt độ mờ */
-        .slider-container { margin-top: 8px; }
-        .slider-label { display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; margin-bottom: 4px; }
-        input[type=range] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
-
-        /* THANH ĐIỀU KHIỂN THỜI GIAN (PHÍA DƯỚI MÀN HÌNH) */
-        #timeline-panel {
-            position: absolute;
-            bottom: 16px;
-            left: 12px;
-            right: 12px;
-            z-index: 1000;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
-        #play-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+        .btn.active {
             background: #0284c7;
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(2, 132, 199, 0.5);
+            color: #ffffff;
+            border-color: #38bdf8;
         }
-
-        .timeline-info { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
-        .time-display { font-size: 13px; font-weight: 600; color: #38bdf8; }
     </style>
 </head>
 <body>
 
-    <!-- BẢNG ĐIỀU KHIỂN GÓC TRÁI -->
-    <div id="left-panel">
-        <div class="panel-title">
-            <span>Giám Sát Thời Tiết</span>
-            <span class="status-dot" id="status-indicator"></span>
-        </div>
-
-        <div class="section-label">Bản Đồ Nền</div>
-        <div class="btn-group">
-            <button class="btn active" id="btn-base-dark" onclick="setBaseMap('dark')">Tối</button>
-            <button class="btn" id="btn-base-sat" onclick="setBaseMap('sat')">Vệ Tinh</button>
-            <button class="btn" id="btn-base-street" onclick="setBaseMap('street')">Đường Phố</button>
-        </div>
-
-        <div class="section-label">Lớp Dữ Liệu Khí Tượng</div>
-        <div class="btn-group">
-            <button class="btn active" id="btn-toggle-cloud" onclick="toggleLayer('cloud')">Mây Vệ Tinh</button>
-            <button class="btn active" id="btn-toggle-radar" onclick="toggleLayer('radar')">Ra-đo Mưa</button>
-        </div>
-
-        <div class="section-label">Độ Hiển Thị Mây & Mưa</div>
-        <div class="slider-container">
-            <div class="slider-label">
-                <span>Độ đậm</span>
-                <span id="opacity-val">75%</span>
-            </div>
-            <input type="range" id="opacity-slider" min="10" max="100" value="75" oninput="changeOpacity(this.value)">
-        </div>
-
-        <button class="btn" style="width: 100%; margin-top: 12px; background: #334155;" onclick="locateUser()">📍 Định Vị Vị Trí Của Tôi</button>
-    </div>
-
-    <!-- THANH PHÁT CHUYỂN ĐỘNG MÂY MƯA (TIMELINE) PHÍA DƯỚI -->
-    <div id="timeline-panel">
-        <button id="play-btn" onclick="togglePlay()">▶</button>
-        <div class="timeline-info">
-            <div class="time-display" id="time-text">Đang tải khung dữ liệu...</div>
-            <input type="range" id="timeline-slider" min="0" max="0" value="0" oninput="manualTimeChange(this.value)">
-        </div>
+    <div id="control-panel">
+        <div id="status-text" style="font-weight: bold; color: #38bdf8; margin-bottom: 4px;">Đang kết nối...</div>
+        
+        <button class="btn active" id="btn-cloud" onclick="toggleCloud()">Mây Vệ Tinh: BẬT</button>
+        <button class="btn active" id="btn-radar" onclick="toggleRadar()">Ra-đo Mưa: BẬT</button>
+        <button class="btn" style="margin-top: 12px; background: #334155; color: #fff;" onclick="locateUser()">📍 Định Vị Vị Trí</button>
     </div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. Khởi tạo bản đồ & chuyển nút Zoom sang góc phải
+        // 1. Khởi tạo bản đồ và chuyển cụm nút Zoom (+/-) sang góc phải
         const map = L.map('map', {
             center: [16.04, 108.2],
             zoom: 6,
@@ -161,155 +76,88 @@
 
         L.control.zoom({ position: 'topright' }).addTo(map);
 
-        // 2. Khai báo các lớp Bản đồ nền
-        const baseMaps = {
-            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }),
-            sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }),
-            street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 })
-        };
-        
-        let currentBase = 'dark';
-        baseMaps.dark.addTo(map);
+        // 2. Bản đồ nền OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
 
-        function setBaseMap(type) {
-            map.removeLayer(baseMaps[currentBase]);
-            baseMaps[type].addTo(map);
-            document.getElementById(`btn-base-${currentBase}`).classList.remove('active');
-            document.getElementById(`btn-base-${type}`).classList.add('active');
-            currentBase = type;
-        }
-
-        // 3. Quản lý luồng dữ liệu Mây & Ra-đa theo thời gian (Timeline)
-        let radarFrames = [];
-        let satFrames = [];
-        let radarLayers = {};
-        let satLayers = {};
-        let currentIndex = 0;
-        let isPlaying = false;
-        let playInterval = null;
-        let currentOpacity = 0.75;
-
+        let cloudLayer = null;
+        let radarLayer = null;
         let showCloud = true;
         let showRadar = true;
 
-        async function initWeatherData() {
+        // 3. Tải dữ liệu mây và mưa
+        async function loadWeather() {
+            const statusText = document.getElementById('status-text');
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+                if (!res.ok) throw new Error('Không tải được API');
+                
                 const data = await res.json();
                 const host = data.host || 'https://tilecache.rainviewer.com';
 
-                radarFrames = data.radar ? data.radar.past : [];
-                satFrames = data.satellite ? data.satellite.infrared : [];
-
-                if (radarFrames.length === 0) return;
-
-                // Cấu hình thanh slider thời gian
-                const slider = document.getElementById('timeline-slider');
-                slider.max = radarFrames.length - 1;
-                slider.value = radarFrames.length - 1;
-                currentIndex = radarFrames.length - 1;
-
-                // Tải trước các lớp dữ liệu
-                radarFrames.forEach((frame, idx) => {
-                    const radarUrl = `${host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`;
-                    radarLayers[idx] = L.tileLayer(radarUrl, {
-                        opacity: showRadar ? currentOpacity : 0,
+                // Lấy ảnh mây vệ tinh mới nhất
+                if (data.satellite && data.satellite.infrared && data.satellite.infrared.length > 0) {
+                    const lastSat = data.satellite.infrared[data.satellite.infrared.length - 1];
+                    cloudLayer = L.tileLayer(`${host}${lastSat.path}/256/{z}/{x}/{y}/0/0_0.png`, {
+                        opacity: 0.55,
                         maxZoom: 18,
                         maxNativeZoom: 8
                     });
+                    if (showCloud) cloudLayer.addTo(map);
+                }
 
-                    // Khung ảnh mây vệ tinh tương ứng
-                    if (satFrames[idx]) {
-                        const satUrl = `${host}${satFrames[idx].path}/256/{z}/{x}/{y}/0/0_0.png`;
-                        satLayers[idx] = L.tileLayer(satUrl, {
-                            opacity: showCloud ? (currentOpacity * 0.7) : 0,
-                            maxZoom: 18,
-                            maxNativeZoom: 8
-                        });
-                    }
-                });
+                // Lấy ảnh ra-đa mưa mới nhất
+                if (data.radar && data.radar.past && data.radar.past.length > 0) {
+                    const lastRadar = data.radar.past[data.radar.past.length - 1];
+                    radarLayer = L.tileLayer(`${host}${lastRadar.path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        opacity: 0.75,
+                        maxZoom: 18,
+                        maxNativeZoom: 8
+                    });
+                    if (showRadar) radarLayer.addTo(map);
+                }
 
-                showFrame(currentIndex);
-                document.getElementById('status-indicator').style.backgroundColor = '#22c55e';
+                statusText.innerText = 'Cập nhật thành công!';
+                statusText.style.color = '#4ade80';
             } catch (err) {
-                console.error("Lỗi dữ liệu:", err);
-                document.getElementById('status-indicator').style.backgroundColor = '#ef4444';
-                document.getElementById('time-text').innerText = "Lỗi kết nối máy chủ thời tiết";
+                console.error(err);
+                statusText.innerText = 'Lỗi tải dữ liệu!';
+                statusText.style.color = '#f87171';
             }
         }
 
-        function showFrame(index) {
-            // Ẩn khung cũ
-            if (radarLayers[currentIndex] && map.hasLayer(radarLayers[currentIndex])) {
-                map.removeLayer(radarLayers[currentIndex]);
-            }
-            if (satLayers[currentIndex] && map.hasLayer(satLayers[currentIndex])) {
-                map.removeLayer(satLayers[currentIndex]);
-            }
-
-            currentIndex = parseInt(index);
-
-            // Hiện khung mới
-            if (showCloud && satLayers[currentIndex]) {
-                satLayers[currentIndex].setOpacity(currentOpacity * 0.7).addTo(map);
-            }
-            if (showRadar && radarLayers[currentIndex]) {
-                radarLayers[currentIndex].setOpacity(currentOpacity).addTo(map);
-            }
-
-            // Cập nhật nhãn thời gian
-            if (radarFrames[currentIndex]) {
-                const timeStr = new Date(radarFrames[currentIndex].time * 1000).toLocaleString('vi-VN', {
-                    hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
-                });
-                document.getElementById('time-text').innerText = `Dữ liệu lúc: ${timeStr}`;
-                document.getElementById('timeline-slider').value = currentIndex;
-            }
-        }
-
-        // 4. Phát chuyển động mây mưa (Animation)
-        function togglePlay() {
-            const btn = document.getElementById('play-btn');
-            if (isPlaying) {
-                clearInterval(playInterval);
-                btn.innerText = "▶";
-                isPlaying = false;
+        // 4. Bật / Tắt lớp mây
+        function toggleCloud() {
+            showCloud = !showCloud;
+            const btn = document.getElementById('btn-cloud');
+            if (showCloud) {
+                btn.innerText = 'Mây Vệ Tinh: BẬT';
+                btn.classList.add('active');
+                if (cloudLayer) cloudLayer.addTo(map);
             } else {
-                btn.innerText = "❚❚";
-                isPlaying = true;
-                playInterval = setInterval(() => {
-                    let next = currentIndex + 1;
-                    if (next >= radarFrames.length) next = 0;
-                    showFrame(next);
-                }, 800); // 0.8 giây chuyển 1 khung hình
+                btn.innerText = 'Mây Vệ Tinh: TẮT';
+                btn.classList.remove('active');
+                if (cloudLayer) map.removeLayer(cloudLayer);
             }
         }
 
-        function manualTimeChange(val) {
-            if (isPlaying) togglePlay(); // Tắt tự động phát nếu người dùng kéo thanh trượt
-            showFrame(val);
-        }
-
-        // 5. Bật / Tắt các lớp mây mưa
-        function toggleLayer(type) {
-            if (type === 'cloud') {
-                showCloud = !showCloud;
-                document.getElementById('btn-toggle-cloud').classList.toggle('active', showCloud);
-            } else if (type === 'radar') {
-                showRadar = !showRadar;
-                document.getElementById('btn-toggle-radar').classList.toggle('active', showRadar);
+        // 5. Bật / Tắt lớp ra-đa mưa
+        function toggleRadar() {
+            showRadar = !showRadar;
+            const btn = document.getElementById('btn-radar');
+            if (showRadar) {
+                btn.innerText = 'Ra-đo Mưa: BẬT';
+                btn.classList.add('active');
+                if (radarLayer) radarLayer.addTo(map);
+            } else {
+                btn.innerText = 'Ra-đo Mưa: TẮT';
+                btn.classList.remove('active');
+                if (radarLayer) map.removeLayer(radarLayer);
             }
-            showFrame(currentIndex);
         }
 
-        // 6. Điều chỉnh độ mờ (Opacity)
-        function changeOpacity(val) {
-            currentOpacity = val / 100;
-            document.getElementById('opacity-val').innerText = `${val}%`;
-            showFrame(currentIndex);
-        }
-
-        // 7. Định vị GPS người dùng
+        // 6. Định vị GPS người dùng
         function locateUser() {
             map.locate({ setView: true, maxZoom: 11 });
         }
@@ -318,8 +166,7 @@
             L.marker(e.latlng).addTo(map).bindPopup("Vị trí của bạn").openPopup();
         });
 
-        // Chạy ứng dụng
-        initWeatherData();
+        loadWeather();
     </script>
 </body>
 </html>
