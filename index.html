@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PTStormWatch 嵐 - JMA Model</title>
-  
+  <title>PTStormWatch 嵐</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
@@ -13,7 +12,7 @@
     /* Header */
     .header { display: flex; justify-content: space-between; align-items: center; color: #fff; padding: 6px 4px; }
     .header .title { font-size: 20px; font-weight: bold; }
-    .header .source-tag { font-size: 10px; background: #1e3a8a; color: #60a5fa; padding: 3px 8px; border-radius: 6px; font-weight: 700; border: 1px solid #3b82f6; }
+    .header .menu-icon { font-size: 22px; cursor: pointer; }
 
     /* Thanh Thời Gian */
     .time-bar-box { 
@@ -62,47 +61,6 @@
     .section-title { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
     .section-subtitle { font-size: 10px; color: #94a3b8; font-weight: 500; }
 
-    /* Khung Radar Đen Tuyền Thuần Túy */
-    .radar-container {
-      width: 100%;
-      height: 240px;
-      background: #020617;
-      border-radius: 14px;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .radar-grid {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-image: radial-gradient(circle, rgba(56, 189, 248, 0.15) 1px, transparent 1px);
-      background-size: 20px 20px;
-    }
-    .radar-ring {
-      position: absolute;
-      border: 1px solid rgba(56, 189, 248, 0.15);
-      border-radius: 50%;
-    }
-    .center-point {
-      width: 8px;
-      height: 8px;
-      background: #ef4444;
-      border-radius: 50%;
-      position: absolute;
-      box-shadow: 0 0 10px #ef4444;
-    }
-    .wind-vector-arrow {
-      position: absolute;
-      font-size: 42px;
-      color: #38bdf8;
-      text-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
-      transition: transform 0.5s ease;
-    }
-
     /* Cuộn Dự Báo Ngắn Hạn */
     .forecast-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .forecast-item { min-width: 76px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px 4px; text-align: center; flex-shrink: 0; }
@@ -128,7 +86,7 @@
     <!-- Header -->
     <div class="header">
       <div class="title">PTStormWatch 嵐</div>
-      <div class="source-tag">JMA MODEL 日本</div>
+      <div class="menu-icon">☰</div>
     </div>
 
     <!-- Live Time Bar -->
@@ -138,7 +96,7 @@
         <div class="live-clock-digits" id="liveClock">00:00:00</div>
       </div>
       <div class="time-row-bottom">
-        <span>Tự động làm mới: <b>5 phút/lần</b></span>
+        <span>Tự động làm mới dữ liệu: <b>5 phút/lần</b></span>
         <span class="status-badge" id="statusBadge">● ĐANG TẢI...</span>
       </div>
     </div>
@@ -201,26 +159,11 @@
       </div>
     </div>
 
-    <!-- Khung Vector Gió RADAR Đen Tuyền (Không cờ, không nhãn) -->
-    <div class="card">
-      <div class="section-title">
-        <span>VECTOR GIÓ RADAR JMA</span>
-        <span class="section-subtitle">NỀN TỐI NGUYÊN BẢN (108.10°E, 10.93°N)</span>
-      </div>
-      <div class="radar-container">
-        <div class="radar-grid"></div>
-        <div class="radar-ring" style="width: 80px; height: 80px;"></div>
-        <div class="radar-ring" style="width: 160px; height: 160px;"></div>
-        <div class="center-point"></div>
-        <div class="wind-vector-arrow" id="radarArrow">⬆</div>
-      </div>
-    </div>
-
     <!-- Forecast Section -->
     <div class="card">
       <div class="section-title">
-        <span>DỰ BÁO GIÓ & MƯA JMA (6H)</span>
-        <span class="section-subtitle">MÔ HÌNH NHẬT BẢN</span>
+        <span>DỰ BÁO GIÓ & MƯA NGẮN HẠN</span>
+        <span class="section-subtitle">MŨI TÊN CHỈ HƯỚNG GIÓ THỔI</span>
       </div>
       <div class="forecast-scroll" id="forecastScroll"></div>
     </div>
@@ -234,7 +177,7 @@
         <div class="station-item">
           <div>
             <div class="station-name">Trạm Phú Thủy</div>
-            <div class="station-sub">Trạm chính - Vi khí hậu JMA</div>
+            <div class="station-sub">Trạm chính - Áp suất & Vi khí hậu</div>
           </div>
           <div class="station-val">
             <div class="station-speed" id="stPhuThuySpeed">-- km/h</div>
@@ -244,7 +187,7 @@
         <div class="station-item">
           <div>
             <div class="station-name">Trạm Mũi Né</div>
-            <div class="station-sub">Trạm ven biển - Dòng gió bờ</div>
+            <div class="station-sub">Trạm ven biển - Theo dõi hướng dông</div>
           </div>
           <div class="station-val">
             <div class="station-speed" id="stMuiNeSpeed">-- km/h</div>
@@ -287,15 +230,15 @@
 
     async function fetchWeatherData() {
       const statusBadge = document.getElementById('statusBadge');
-      statusBadge.innerText = "● ĐANG CẬP NHẬT JMA...";
+      statusBadge.innerText = "● ĐANG CẬP NHẬT...";
       statusBadge.style.color = "#f59e0b";
 
-      // NGUỒN DỮ LIỆU CHÍNH THỨC TỪ MÔ HÌNH JMA (CỤC KHÍ TƯỢNG NHẬT BẢN)
+      // NGUỒN CHUẨN TỪ MÔ HÌNH KHÍ TƯỢNG NHẬT BẢN (JMA)
       const apiUrl = "https://api.open-meteo.com/v1/jma?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
 
       try {
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("JMA API Error");
+        if (!response.ok) throw new Error("API Error");
         const data = await response.json();
         const current = data.current;
 
@@ -317,6 +260,7 @@
         
         const currentRainProb = data.hourly.precipitation_probability ? data.hourly.precipitation_probability[startIndex] : 0;
         const currentRainMm = data.hourly.precipitation ? data.hourly.precipitation[startIndex] : 0;
+        
         document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
 
         document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
@@ -328,9 +272,6 @@
         document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDir} 50 50)`);
         document.getElementById('windDirectionText').innerText = `${getWindDirName(windDir)} (${windDir}°)`;
 
-        // XOAY MŨI TÊN VECTOR TRÊN KHUNG RADAR NỀN ĐEN
-        document.getElementById('radarArrow').style.transform = `rotate(${windDir + 180}deg)`;
-
         const beaufort = getBeaufort(current.wind_speed_10m);
         document.getElementById('beaufortText').innerText = beaufort.desc;
 
@@ -341,7 +282,6 @@
         document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
         document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
 
-        // Render dự báo 6 giờ tiếp theo từ JMA
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
 
@@ -367,11 +307,11 @@
           `;
         }
 
-        statusBadge.innerText = "● JMA CHUẨN XÁC";
+        statusBadge.innerText = "● MỚI NHẤT (JMA)";
         statusBadge.style.color = "#4ade80";
       } catch (err) {
-        console.error("Lỗi lấy dữ liệu JMA:", err);
-        statusBadge.innerText = "● LỖI MẠNG JMA";
+        console.error("Lỗi lấy dữ liệu:", err);
+        statusBadge.innerText = "● LỖI MẠNG";
         statusBadge.style.color = "#ef4444";
       }
     }
