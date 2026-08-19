@@ -12,20 +12,20 @@
 </head>
 <body>
 
-    <!-- Gọi file japan-map.html ra chạy riêng trong khung cách ly -->
+    <!-- Khung nhúng riêng biệt gọi file japan-map.html -->
     <iframe id="app-frame" src="japan-map.html"></iframe>
 
     <script>
-        // Lắng nghe báo cáo dữ liệu gửi về từ file japan-map.html
+        // Lắng nghe dữ liệu báo cáo gửi về từ japan-map.html
         window.addEventListener("message", function(event) {
             if (event.data && event.data.status === "SUCCESS") {
-                console.log("Đã nhận dữ liệu từ giao diện Nhật Bản:");
+                console.log("Đã nhận dữ liệu từ japan-map.html thành công!");
                 console.log("Tốc độ gió:", event.data.windSpeed, "km/h");
                 console.log("Nhiệt độ:", event.data.temp, "°C");
             }
         });
 
-        // Hàm giúp index.html ra lệnh cho giao diện tự cập nhật lại dữ liệu nếu cần
+        // Hàm giúp index.html gửi lệnh làm mới dữ liệu sang japan-map.html
         function lamMoiGiaoDien() {
             var frame = document.getElementById('app-frame');
             if (frame && frame.contentWindow) {
