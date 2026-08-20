@@ -23,10 +23,10 @@ body {
     overflow: hidden;
 }
 
-/* Header */
+/* Header - Đã thu nhỏ gọn gàng */
 .header {
-    height: 60px;
-    padding: 0 16px;
+    height: 48px;
+    padding: 0 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,17 +39,17 @@ body {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .header-btn {
-    width: 42px;
-    height: 42px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #f8fafc;
-    font-size: 20px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,15 +65,15 @@ body {
 .title-pill {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: rgba(56, 189, 248, 0.1);
-    padding: 6px 14px;
-    border-radius: 30px;
+    padding: 4px 10px;
+    border-radius: 20px;
     border: 1px solid rgba(56, 189, 248, 0.25);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     color: #38bdf8;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
 }
 
 /* Menu */
@@ -385,7 +385,7 @@ const MODEL = "Gemini 2.5 Flash Lite";
 const API_URL = `https://shy-sound-9c61.tandao1993pt.workers.dev`;
 const PROMPT_URL = `https://tandao1993pt-cyber.github.io/weather-app/prompt.AI.txt`;
 
-let SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
+let SYSTEM_INSTRUCTION = "Bạn là trợ lý thời tiết Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, không dùng ký tự đặc biệt, không viết đậm, không gạch đầu dòng.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
@@ -431,6 +431,7 @@ async function sendMessage() {
 
     const loading = addAIMessage("Đang suy nghĩ...");
 
+    // Tải thông tin chỉ dẫn mới nhất từ GitHub
     try {
         const promptRes = await fetch(PROMPT_URL);
         if (promptRes.ok) {
@@ -443,10 +444,15 @@ async function sendMessage() {
         console.log("Dùng chỉ dẫn mặc định do không tải được file GitHub.");
     }
 
+    // Tự động gắn ngày giờ thực tế từ điện thoại vào câu lệnh
+    const now = new Date();
+    const timeString = now.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+    const fullInstruction = SYSTEM_INSTRUCTION + `\n[Thời gian thực tế hiện tại: ${timeString}]`;
+
     try {
         const payload = {
             system_instruction: { 
-                parts: [{ text: SYSTEM_INSTRUCTION }] 
+                parts: [{ text: fullInstruction }] 
             },
             contents: [
                 { parts: [{ text: text }] }
