@@ -383,8 +383,9 @@ textarea::placeholder { color: #64748b; }
 const API_KEY = "";
 const MODEL = "Gemini 2.5 Flash Lite";
 const API_URL = `https://shy-sound-9c61.tandao1993pt.workers.dev`;
-    
-const SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
+const PROMPT_URL = `https://tandao1993pt-cyber.github.io/weather-app/prompt.AI.txt`;
+
+let SYSTEM_INSTRUCTION = "Bạn là trợ lý nói giọng nói cho người dân Phan Thiết. Hãy trả lời bằng VĂN BẢN THUẦN TÚY, tuyệt đối KHÔNG dùng ký tự đặc biệt, KHÔNG dùng dấu sao (*), KHÔNG dùng gạch đầu dòng, KHÔNG dùng chữ in đậm. Hãy viết thành các câu ngắn mượt mà như lời nói hàng ngày để máy đọc âm thanh phát ra rõ ràng nhất.";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
@@ -429,6 +430,18 @@ async function sendMessage() {
     autoResize();
 
     const loading = addAIMessage("Đang suy nghĩ...");
+
+    try {
+        const promptRes = await fetch(PROMPT_URL);
+        if (promptRes.ok) {
+            const remotePrompt = await promptRes.text();
+            if (remotePrompt.trim()) {
+                SYSTEM_INSTRUCTION = remotePrompt.trim();
+            }
+        }
+    } catch (e) {
+        console.log("Dùng chỉ dẫn mặc định do không tải được file GitHub.");
+    }
 
     try {
         const payload = {
