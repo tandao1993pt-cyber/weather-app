@@ -63,19 +63,27 @@
             z-index: 10;
         }
 
+        /* Ô thứ 5 trải rộng full hàng dưới */
+        .card-full {
+            grid-column: span 2;
+            flex-direction: row;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px;
+        }
+
         .card:active {
             transform: scale(0.96);
             background: #334155;
         }
 
         .card-icon {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 8px;
+            width: 36px;
+            height: 36px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 28px;
+            font-size: 26px;
         }
 
         .card-icon img {
@@ -83,6 +91,16 @@
             height: 100%;
             object-fit: contain;
             filter: brightness(0.9) contrast(1.1) drop-shadow(0 0 3px rgba(56, 189, 248, 0.3));
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-full .card-info {
+            align-items: flex-start;
         }
 
         .card-title {
@@ -94,7 +112,7 @@
         .card-desc {
             font-size: 11px;
             color: #94a3b8;
-            margin-top: 4px;
+            margin-top: 2px;
             text-align: center;
         }
 
@@ -121,44 +139,57 @@
 
     <div class="grid-container">
         
+        <!-- HÀNG 1 -->
         <!-- Ô 1: Trợ lý AI -->
         <a href="ai.html" onclick="location.href='ai.html'; return false;" class="card">
             <span class="badge badge-ai">AI</span>
             <div class="card-icon">
                 <img src="https://i.postimg.cc/c6GW8jW6/file-000000008a2881fa8230f667f92fe628.png" alt="AI">
             </div>
-            <div class="card-title">Trợ Lý AI</div>
-            <div class="card-desc">Hỏi đáp & Phân tích</div>
+            <div class="card-info">
+                <div class="card-title">Trợ Lý AI</div>
+                <div class="card-desc">Hỏi đáp & Phân tích</div>
+            </div>
         </a>
 
         <!-- Ô 2: Ra-da Windy -->
         <a href="rada-windy.html" onclick="location.href='rada-windy.html'; return false;" class="card">
             <span class="badge badge-live">LIVE</span>
             <div class="card-icon">🛰️</div>
-            <div class="card-title">Ra-da Windy</div>
-            <div class="card-desc">Bản đồ phóng to</div>
+            <div class="card-info">
+                <div class="card-title">Ra-da Windy</div>
+                <div class="card-desc">Bản đồ phóng to</div>
+            </div>
         </a>
 
+        <!-- HÀNG 2 -->
         <!-- Ô 3: Mây Dông -->
         <a href="https://ptstormwatch.blogspot.com" target="_blank" class="card">
             <div class="card-icon">🌩️</div>
-            <div class="card-title">Mây Dông</div>
-            <div class="card-desc">Tin tức Blogspot</div>
+            <div class="card-info">
+                <div class="card-title">Mây Dông</div>
+                <div class="card-desc">Tin tức Blogspot</div>
+            </div>
         </a>
 
         <!-- Ô 4: Trang Thời Tiết chính -->
         <a href="index.html" onclick="location.href='index.html'; return false;" class="card">
             <div class="card-icon">🧪</div>
-            <div class="card-title">Trang Thời Tiết</div>
-            <div class="card-desc">Dữ liệu tổng hợp</div>
+            <div class="card-info">
+                <div class="card-title">Trang Thời Tiết</div>
+                <div class="card-desc">Dữ liệu tổng hợp</div>
+            </div>
         </a>
 
-        <!-- Ô 5: Ra-da Nasaki (Thêm mới) -->
-        <a href="radnasaki.html" onclick="location.href='radnasaki.html'; return false;" class="card">
+        <!-- HÀNG 3: NẰM RIÊNG Ở DƯỚI CÙNG -->
+        <!-- Ô 5: Ra-da Nasaki -->
+        <a href="radnasaki.html" onclick="location.href='radnasaki.html'; return false;" class="card card-full">
             <span class="badge badge-jp">JAPAN</span>
             <div class="card-icon">🌸</div>
-            <div class="card-title">Rad Nasaki</div>
-            <div class="card-desc">Ra-da Nhật Bản</div>
+            <div class="card-info">
+                <div class="card-title">Rad Nasaki</div>
+                <div class="card-desc">Ra-da Nhật Bản chuyên sâu</div>
+            </div>
         </a>
 
     </div>
