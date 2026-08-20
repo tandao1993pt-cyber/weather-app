@@ -60,7 +60,7 @@
             transition: all 0.2s ease;
             position: relative;
             cursor: pointer;
-            z-index: 10; /* Đảm bảo nổi lên trên */
+            z-index: 10;
         }
 
         .card:active {
@@ -75,6 +75,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 28px;
         }
 
         .card-icon img {
@@ -108,6 +109,7 @@
         }
         .badge-ai { background: #8b5cf6; color: #fff; }
         .badge-live { background: #ef4444; color: #fff; }
+        .badge-jp { background: #f97316; color: #fff; }
     </style>
 </head>
 <body>
@@ -144,13 +146,19 @@
             <div class="card-desc">Tin tức Blogspot</div>
         </a>
 
-        <!-- Ô 4: Trang Thời Tiết chính (Test) -->
-<a href="index.html" target="_blank" class="card">
-    <div class="card-icon">🧪</div>
-    <div class="card-title">Trang Thời Tiết</div>
-    <div class="card-desc">Dữ liệu tổng hợp</div>
-</a>
-        
+        <!-- Ô 4: Trang Thời Tiết chính -->
+        <a href="index.html" onclick="location.href='index.html'; return false;" class="card">
+            <div class="card-icon">🧪</div>
+            <div class="card-title">Trang Thời Tiết</div>
+            <div class="card-desc">Dữ liệu tổng hợp</div>
+        </a>
+
+        <!-- Ô 5: Ra-da Nasaki (Thêm mới) -->
+        <a href="radnasaki.html" onclick="location.href='radnasaki.html'; return false;" class="card">
+            <span class="badge badge-jp">JAPAN</span>
+            <div class="card-icon">🌸</div>
+            <div class="card-title">Rad Nasaki</div>
+            <div class="card-desc">Ra-da Nhật Bản</div>
         </a>
 
     </div>
