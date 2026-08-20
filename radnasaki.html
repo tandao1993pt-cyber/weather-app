@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PTStormWatch - Phân Tích Thủ Công</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0d1117; color: #f0f4f8; padding: 16px; display: flex; justify-content: center; }
+    
+    .app-card { width: 100%; max-width: 400px; background: #161b22; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #30363d; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 16px; }
+    .location { font-size: 22px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+    .app-title { font-size: 12px; color: #58a6ff; font-weight: 600; letter-spacing: 0.5px; }
+    .update-badge { display: inline-block; background: #21262d; color: #8b949e; font-size: 11px; padding: 4px 10px; border-radius: 12px; margin-top: 6px; border: 1px solid #30363d; }
 
+    /* Thông báo nhanh */
+    .ticker { background: rgba(56, 139, 253, 0.1); border-left: 3px solid #58a6ff; padding: 10px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 16px; color: #c9d1d9; }
+
+    /* Bảng thông số 3 ô */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; text-align: center; }
+    .stat-box { background: #21262d; padding: 10px 6px; border-radius: 14px; border: 1px solid #30363d; }
+    .stat-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+    .stat-value { font-size: 14px; font-weight: 700; color: #ffffff; }
+
+    /* Ô hiển thị bản đồ */
+    .map-box { background: #0d1117; border-radius: 16px; overflow: hidden; border: 1px solid #30363d; margin-bottom: 16px; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+    .map-box img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+    /* Ô NỘI DUNG PHÂN TÍCH TỪ FILE PLAY.TXT NẰM Ở DƯỚI */
+    .analysis-box { background: #21262d; border-radius: 16px; padding: 14px; border: 1px solid #30363d; }
+    .analysis-header { font-size: 13px; font-weight: 700; color: #d29922; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .analysis-content { font-size: 13px; color: #c9d1d9; line-height: 1.6; white-space: pre-line; }
+
+    /* Trạng thái chưa cập nhật */
+    .empty-text { text-align: center; color: #f85149; padding: 12px 0; font-size: 13px; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<div class="app-card">
+  <!-- Header -->
+  <div class="header">
+    <div class="location">Phan Thiết</div>
+    <div class="app-title">PTSTORM WATCH • BẢN TIN THỦ CÔNG</div>
+    <div id="updateTime" class="update-badge">Đang kiểm tra...</div>
+  </div>
+
+  <!-- Băng thông báo ngắn -->
+  <div id="tickerBox" class="ticker">📢 Đang kết nối dữ liệu...</div>
+
+  <!-- 3 Thông số chính -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">🌧️ Mưa</div>
+      <div id="rainVal" class="stat-value">--</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">💧 Độ ẩm</div>
+      <div id="humidityVal" class="stat-value">--</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">💨 Hướng gió</div>
+      <div id="windVal" class="stat-value">--</div>
+    </div>
+  </div>
+
+  <!-- Ô chứa ảnh bản đồ -->
+  <div id="mapContainer" class="map-box"></div>
+
+  <!-- Ô HIỂN THỊ NỘI DUNG PHÂN TÍCH NẰM Ở DƯỚI (LIÊN KẾT PLAY.TXT) -->
+  <div class="analysis-box">
+    <div class="analysis-header">📝 Nhận Định Chuyên Sâu</div>
+    <div id="analysisContent" class="analysis-content">Đang tải phân tích từ thư viện...</div>
+  </div>
+</div>
+
+<script>
+  // Link Raw kết nối trực tiếp tới file Play.txt trên GitHub của bạn
+  const playTxtUrl = "https://raw.githubusercontent.com/tandao1993pt-cyber/weather-app/main/Play.txt";
+
+  const dataStore = {
+    hasData: true, // Đổi thành false khi bận việc / chưa có tin
+    scheduledSlot: "19:00", 
+    rain: "2.0mm",
+    humidity: "82%",
+    wind: "4.5m/s Đông",
+    imageUrl: "https://via.placeholder.com/400x220/161b22/ffffff?text=Ban+Do+Thoi+Tiet+Phan+Thiet",
+    tickerText: "Mũi Né & Phan Thiết chiều tối có khả năng xuất hiện mưa dông cục bộ."
+  };
+
+  async function fetchPlayTxt() {
+    const analysisContentEl = document.getElementById("analysisContent");
+    
+    if (!dataStore.hasData) {
+      analysisContentEl.innerHTML = `<div class="empty-text">[Chưa có bản tin cập nhật cho khung giờ này]</div>`;
+      return;
+    }
+
+    try {
+      // Đọc dữ liệu trực tiếp từ file Play.txt
+      const response = await fetch(playTxtUrl + '?t=' + new Date().getTime());
+      if (response.ok) {
+        const text = await response.text();
+        analysisContentEl.innerText = text.trim() !== "" ? text : "[File Play.txt chưa có nội dung]";
+      } else {
+        analysisContentEl.innerText = "[Không thể kết nối tới file Play.txt]";
+      }
+    } catch (error) {
+      analysisContentEl.innerText = "[Lỗi tải dữ liệu phân tích]";
+    }
+  }
+
+  function renderApp() {
+    const updateTimeEl = document.getElementById("updateTime");
+    const tickerBoxEl = document.getElementById("tickerBox");
+    const rainValEl = document.getElementById("rainVal");
+    const humidityValEl = document.getElementById("humidityVal");
+    const windValEl = document.getElementById("windVal");
+    const mapContainerEl = document.getElementById("mapContainer");
+
+    if (dataStore.hasData) {
+      updateTimeEl.innerText = `Cập nhật khung: ${dataStore.scheduledSlot}`;
+      tickerBoxEl.innerText = `📢 ${dataStore.tickerText}`;
+      rainValEl.innerText = dataStore.rain;
+      humidityValEl.innerText = dataStore.humidity;
+      windValEl.innerText = dataStore.wind;
+      mapContainerEl.innerHTML = `<img src="${dataStore.imageUrl}" alt="Bản đồ dự báo">`;
+    } else {
+      updateTimeEl.innerText = `Khung giờ: ${dataStore.scheduledSlot}`;
+      tickerBoxEl.innerText = `⚠️ Chưa có bản tin mới`;
+      rainValEl.innerText = "--";
+      humidityValEl.innerText = "--";
+      windValEl.innerText = "--";
+      mapContainerEl.innerHTML = `<div class="empty-text">Chưa có hình ảnh bản đồ mới</div>`;
+    }
+
+    // Gọi hàm đọc file Play.txt
+    fetchPlayTxt();
+  }
+
+  renderApp();
+</script>
+
+</body>
+</html>
