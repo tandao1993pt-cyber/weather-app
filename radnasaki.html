@@ -31,7 +31,6 @@
       gap: 14px;
     }
     
-    /* Header */
     .header { 
       text-align: center; 
       padding: 8px 0;
@@ -70,7 +69,6 @@
       box-shadow: 0 0 8px #22c55e;
     }
 
-    /* Băng thông báo */
     .ticker { 
       background: rgba(56, 189, 248, 0.08); 
       border-left: 4px solid #38bdf8; 
@@ -80,9 +78,8 @@
       color: #e2e8f0;
     }
 
-    /* KHUNG DỰ BÁO THEO GIỜ KIỂU NHẬT */
     #timelineSection {
-      display: none; /* Mặc định ẩn, chỉ hiện khi có dữ liệu */
+      display: none;
     }
     .timeline-header {
       font-size: 12px;
@@ -100,9 +97,8 @@
       padding-bottom: 4px;
       scrollbar-width: none;
     }
-    .timeline-scroll::-webkit-scrollbar {
-      display: none;
-    }
+    .timeline-scroll::-webkit-scrollbar { display: none; }
+    
     .hourly-card {
       min-width: 66px;
       background: rgba(30, 41, 59, 0.6);
@@ -122,7 +118,6 @@
     .hourly-temp { font-size: 13px; font-weight: 700; color: #ffffff; }
     .hourly-wind { font-size: 10px; color: #94a3b8; }
 
-    /* Ô hiển thị ảnh bản đồ */
     .map-box { 
       width: 100%;
       background: #020617; 
@@ -141,7 +136,6 @@
       object-fit: cover; 
     }
 
-    /* Ô Phân Tích Chuyên Sâu */
     .analysis-box { 
       background: rgba(30, 41, 59, 0.5); 
       border-radius: 18px; 
@@ -176,7 +170,6 @@
 <body>
 
 <div class="app-container">
-  <!-- Header -->
   <div class="header">
     <div class="location">Phan Thiết</div>
     <div class="app-title">PTSTORM WATCH • BẢN TIN THỦ CÔNG</div>
@@ -186,10 +179,8 @@
     </div>
   </div>
 
-  <!-- Băng thông báo -->
   <div id="tickerBox" class="ticker">📢 Đang kiểm tra dữ liệu...</div>
 
-  <!-- CỤM THỜI TIẾT THEO GIỜ (Tự ẩn hoàn toàn nếu chưa có bản tin mới) -->
   <div id="timelineSection">
     <div class="timeline-header">
       <span>Dự báo theo giờ</span>
@@ -198,10 +189,8 @@
     <div id="hourlyTimeline" class="timeline-scroll"></div>
   </div>
 
-  <!-- Ô chứa ảnh bản đồ -->
   <div id="mapContainer" class="map-box"></div>
 
-  <!-- Ô Phân Tích Kết Nối Play.txt -->
   <div class="analysis-box">
     <div class="analysis-header">📝 Nhận Định Chuyên Sâu</div>
     <div id="analysisContent" class="analysis-content">Đang đồng bộ dữ liệu...</div>
@@ -220,11 +209,6 @@
     { time: "04:00", icon: "🌤️", rain: "0 mm", temp: "24°C", wind: "8 km/h" },
     { time: "07:00", icon: "☀️", rain: "0 mm", temp: "27°C", wind: "11 km/h" }
   ];
-
-  const dataStore = {
-    tickerText: "Mũi Né & Phan Thiết chiều tối có khả năng xuất hiện mưa dông cục bộ.",
-    imageUrl: "https://i.postimg.cc/9F4sB168/sounding-example.png"
-  };
 
   function renderHourlyCards() {
     const timelineEl = document.getElementById("hourlyTimeline");
@@ -256,14 +240,34 @@
       
       if (response.ok) {
         const text = await response.text();
-        const trimmedText = text.trim();
+        const lines = text.trim().split('\n');
 
-        if (trimmedText !== "") {
-          // --- CÓ DỮ LIỆU MỚI ---
-          analysisContentEl.innerText = trimmedText;
-          tickerBoxEl.innerText = `📢 ${dataStore.tickerText}`;
-          mapContainerEl.innerHTML = `<img src="${dataStore.imageUrl}" alt="Bản đồ thời tiết" onerror="this.parentNode.innerHTML='<div class=\\'empty-text\\'>Chưa có ảnh bản đồ</div>'">`;
+        // Bỏ dòng trống
+        const validLines = lines.map(l => l.trim()).filter(l => l !== "");
+
+        if (validLines.length > 0) {
+          // Tách link ảnh ở dòng 1 (nếu có bắt đầu bằng http)
+          let imageUrl = "";
+          let textLines = [];
+
+          if (validLines[0].startsWith("http")) {
+            imageUrl = validLines[0];
+            textLines = validLines.slice(1);
+          } else {
+            textLines = validLines;
+          }
+
+          // Hiển thị chữ
+          analysisContentEl.innerText = textLines.join('\n');
+          tickerBoxEl.innerText = `📢 Mũi Né & Phan Thiết chiều tối có khả năng xuất hiện mưa dông cục bộ.`;
           
+          // Hiển thị ảnh
+          if (imageUrl !== "") {
+            mapContainerEl.innerHTML = `<img src="${imageUrl}" alt="Bản đồ thời tiết" onerror="this.parentNode.innerHTML='<div class=\\'empty-text\\'>Ảnh lỗi hoặc link không khả dụng</div>'">`;
+          } else {
+            mapContainerEl.innerHTML = `<div class="empty-text">Chưa dán link ảnh bản đồ</div>`;
+          }
+
           // Hiện thanh thời tiết theo giờ
           timelineSection.style.display = "block";
           renderHourlyCards();
@@ -276,12 +280,10 @@
           statusDotEl.style.backgroundColor = "#22c55e";
           statusDotEl.style.boxShadow = "0 0 8px #22c55e";
         } else {
-          // --- CHƯA CÓ DỮ LIỆU (FILE TRỐNG) ---
+          // FILE TRỐNG HOÀN TOÀN -> ẨN HẾT
           analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật</div>`;
           tickerBoxEl.innerText = `⚠️ Bản tin chưa được cập nhật`;
           mapContainerEl.innerHTML = `<div class="empty-text">Chưa có dữ liệu bản đồ</div>`;
-          
-          // ẨN HOÀN TOÀN thanh thời tiết theo giờ
           timelineSection.style.display = "none";
 
           timeTextEl.innerText = `Trạng thái: Vẫn chưa cập nhật`;
@@ -289,8 +291,7 @@
           statusDotEl.style.boxShadow = "0 0 8px #f59e0b";
         }
       } else {
-        // Lỗi kết nối server
-        analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật (Không thể kết nối)</div>`;
+        analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật</div>`;
         timelineSection.style.display = "none";
         timeTextEl.innerText = `Trạng thái: Vẫn chưa cập nhật`;
         statusDotEl.style.backgroundColor = "#ef4444";
