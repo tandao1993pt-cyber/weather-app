@@ -70,7 +70,7 @@
       box-shadow: 0 0 8px #22c55e;
     }
 
-    /* Băng thông báo ngắn */
+    /* Băng thông báo */
     .ticker { 
       background: rgba(56, 189, 248, 0.08); 
       border-left: 4px solid #38bdf8; 
@@ -80,7 +80,10 @@
       color: #e2e8f0;
     }
 
-    /* KHUNG DỰ BÁO THEO GIỜ KIỂU NHẬT (HOURLY TIMELINE) */
+    /* KHUNG DỰ BÁO THEO GIỜ KIỂU NHẬT */
+    #timelineSection {
+      display: none; /* Mặc định ẩn, chỉ hiện khi có dữ liệu */
+    }
     .timeline-header {
       font-size: 12px;
       font-weight: 700;
@@ -88,12 +91,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 8px;
     }
     .timeline-scroll {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 4px 0 8px 0;
+      padding-bottom: 4px;
       scrollbar-width: none;
     }
     .timeline-scroll::-webkit-scrollbar {
@@ -137,7 +141,7 @@
       object-fit: cover; 
     }
 
-    /* Ô Phân Tích Chuyên Sâu Kết Nối Play.txt */
+    /* Ô Phân Tích Chuyên Sâu */
     .analysis-box { 
       background: rgba(30, 41, 59, 0.5); 
       border-radius: 18px; 
@@ -160,7 +164,13 @@
       white-space: pre-line; 
     }
 
-    .empty-text { text-align: center; color: #ef4444; padding: 12px 0; font-size: 13px; }
+    .empty-text { 
+      text-align: center; 
+      color: #f59e0b; 
+      padding: 12px 0; 
+      font-size: 13px; 
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -177,32 +187,30 @@
   </div>
 
   <!-- Băng thông báo -->
-  <div id="tickerBox" class="ticker">📢 Đang tải dữ liệu...</div>
+  <div id="tickerBox" class="ticker">📢 Đang kiểm tra dữ liệu...</div>
 
-  <!-- DỰ BÁO THEO KHUNG GIỜ STYLE NHẬT BẢN -->
-  <div class="timeline-header">
-    <span>Dự báo theo giờ</span>
-    <span style="font-weight: normal; font-size: 11px;">Vuốt ngang ➔</span>
-  </div>
-  
-  <div id="hourlyTimeline" class="timeline-scroll">
-    <!-- Code sẽ tự tạo các ô giờ ở đây -->
+  <!-- CỤM THỜI TIẾT THEO GIỜ (Tự ẩn hoàn toàn nếu chưa có bản tin mới) -->
+  <div id="timelineSection">
+    <div class="timeline-header">
+      <span>Dự báo theo giờ</span>
+      <span style="font-weight: normal; font-size: 11px;">Vuốt ngang ➔</span>
+    </div>
+    <div id="hourlyTimeline" class="timeline-scroll"></div>
   </div>
 
-  <!-- Ô chứa ảnh bản đồ / Giản đồ -->
+  <!-- Ô chứa ảnh bản đồ -->
   <div id="mapContainer" class="map-box"></div>
 
   <!-- Ô Phân Tích Kết Nối Play.txt -->
   <div class="analysis-box">
     <div class="analysis-header">📝 Nhận Định Chuyên Sâu</div>
-    <div id="analysisContent" class="analysis-content">Đang lấy dữ liệu từ Play.txt...</div>
+    <div id="analysisContent" class="analysis-content">Đang đồng bộ dữ liệu...</div>
   </div>
 </div>
 
 <script>
   const playTxtUrl = "https://raw.githubusercontent.com/tandao1993pt-cyber/weather-app/main/Play.txt";
 
-  // Mẫu chuỗi thời tiết theo từng khung giờ (Kiểu Nhật)
   const hourlyData = [
     { time: "13:00", icon: "☀️", rain: "0 mm", temp: "31°C", wind: "12 km/h" },
     { time: "16:00", icon: "⛅", rain: "0 mm", temp: "30°C", wind: "15 km/h" },
@@ -215,7 +223,6 @@
 
   const dataStore = {
     tickerText: "Mũi Né & Phan Thiết chiều tối có khả năng xuất hiện mưa dông cục bộ.",
-    // Thay link ảnh hiển thị bản đồ của bạn vào đây:
     imageUrl: "https://i.postimg.cc/9F4sB168/sounding-example.png"
   };
 
@@ -236,42 +243,67 @@
     timelineEl.innerHTML = html;
   }
 
-  async function fetchPlayTxt() {
+  async function checkAndUpdate() {
+    const timelineSection = document.getElementById("timelineSection");
     const analysisContentEl = document.getElementById("analysisContent");
     const statusDotEl = document.getElementById("statusDot");
     const timeTextEl = document.getElementById("timeText");
+    const tickerBoxEl = document.getElementById("tickerBox");
+    const mapContainerEl = document.getElementById("mapContainer");
 
     try {
       const response = await fetch(playTxtUrl + '?t=' + new Date().getTime());
+      
       if (response.ok) {
         const text = await response.text();
-        analysisContentEl.innerText = text.trim() !== "" ? text : "[File Play.txt chưa có nội dung]";
-        
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-        const dateString = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-        
-        timeTextEl.innerText = `Cập nhật: ${timeString} (${dateString})`;
-        statusDotEl.style.backgroundColor = "#22c55e";
-        statusDotEl.style.boxShadow = "0 0 8px #22c55e";
+        const trimmedText = text.trim();
+
+        if (trimmedText !== "") {
+          // --- CÓ DỮ LIỆU MỚI ---
+          analysisContentEl.innerText = trimmedText;
+          tickerBoxEl.innerText = `📢 ${dataStore.tickerText}`;
+          mapContainerEl.innerHTML = `<img src="${dataStore.imageUrl}" alt="Bản đồ thời tiết" onerror="this.parentNode.innerHTML='<div class=\\'empty-text\\'>Chưa có ảnh bản đồ</div>'">`;
+          
+          // Hiện thanh thời tiết theo giờ
+          timelineSection.style.display = "block";
+          renderHourlyCards();
+
+          const now = new Date();
+          const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          const dateString = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+          
+          timeTextEl.innerText = `Cập nhật: ${timeString} (${dateString})`;
+          statusDotEl.style.backgroundColor = "#22c55e";
+          statusDotEl.style.boxShadow = "0 0 8px #22c55e";
+        } else {
+          // --- CHƯA CÓ DỮ LIỆU (FILE TRỐNG) ---
+          analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật</div>`;
+          tickerBoxEl.innerText = `⚠️ Bản tin chưa được cập nhật`;
+          mapContainerEl.innerHTML = `<div class="empty-text">Chưa có dữ liệu bản đồ</div>`;
+          
+          // ẨN HOÀN TOÀN thanh thời tiết theo giờ
+          timelineSection.style.display = "none";
+
+          timeTextEl.innerText = `Trạng thái: Vẫn chưa cập nhật`;
+          statusDotEl.style.backgroundColor = "#f59e0b";
+          statusDotEl.style.boxShadow = "0 0 8px #f59e0b";
+        }
       } else {
-        analysisContentEl.innerText = "[Lỗi kết nối tới file Play.txt]";
+        // Lỗi kết nối server
+        analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật (Không thể kết nối)</div>`;
+        timelineSection.style.display = "none";
+        timeTextEl.innerText = `Trạng thái: Vẫn chưa cập nhật`;
         statusDotEl.style.backgroundColor = "#ef4444";
       }
     } catch (e) {
-      analysisContentEl.innerText = "[Lỗi nạp dữ liệu]";
+      analysisContentEl.innerHTML = `<div class="empty-text">Thông tin vẫn chưa cập nhật</div>`;
+      timelineSection.style.display = "none";
+      timeTextEl.innerText = `Trạng thái: Vẫn chưa cập nhật`;
       statusDotEl.style.backgroundColor = "#ef4444";
     }
   }
 
-  function init() {
-    document.getElementById("tickerBox").innerText = `📢 ${dataStore.tickerText}`;
-    document.getElementById("mapContainer").innerHTML = `<img src="${dataStore.imageUrl}" alt="Bản đồ thời tiết" onerror="this.parentNode.innerHTML='<div class=\\'empty-text\\'>Chưa có ảnh bản đồ</div>'">`;
-    renderHourlyCards();
-    fetchPlayTxt();
-  }
-
-  init();
+  checkAndUpdate();
 </script>
 
 </body>
