@@ -21,7 +21,6 @@
       overflow-x: hidden;
     }
     
-    /* Khung tràn toàn màn hình */
     .app-container { 
       width: 100%; 
       min-height: 100vh;
@@ -32,7 +31,6 @@
       gap: 14px;
     }
     
-    /* Header hiện đại */
     .header { 
       text-align: center; 
       padding: 12px 0;
@@ -71,7 +69,6 @@
       box-shadow: 0 0 8px #22c55e;
     }
 
-    /* Băng thông báo ngắn */
     .ticker { 
       background: rgba(56, 189, 248, 0.08); 
       border-left: 4px solid #38bdf8; 
@@ -82,7 +79,6 @@
       backdrop-filter: blur(5px);
     }
 
-    /* Bảng thông số 3 ô tràn rộng */
     .stats-grid { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr); 
@@ -106,7 +102,6 @@
       color: #ffffff; 
     }
 
-    /* Ô hiển thị bản đồ tràn lề */
     .map-box { 
       width: 100%;
       background: #020617; 
@@ -125,7 +120,6 @@
       object-fit: cover; 
     }
 
-    /* Ô nội dung phân tích từ Play.txt ở dưới cùng */
     .analysis-box { 
       background: rgba(30, 41, 59, 0.5); 
       border-radius: 18px; 
@@ -148,7 +142,6 @@
       white-space: pre-line; 
     }
 
-    /* Trạng thái chưa cập nhật / Máy chủ bận */
     .empty-text { 
       text-align: center; 
       color: #ef4444; 
@@ -174,7 +167,7 @@
   <!-- Băng thông báo ngắn -->
   <div id="tickerBox" class="ticker">📢 Đang kết nối máy chủ dữ liệu...</div>
 
-  <!-- 3 Thông số chính (Đơn vị gió đã đổi sang km/h) -->
+  <!-- 3 Thông số chính -->
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-label">🌧️ Mưa</div>
@@ -201,41 +194,55 @@
 </div>
 
 <script>
-  // Link kết nối trực tiếp file Play.txt trên GitHub
   const playTxtUrl = "https://raw.githubusercontent.com/tandao1993pt-cyber/weather-app/main/Play.txt";
 
   const dataStore = {
-    hasData: true, // Đổi sang false nếu bạn muốn chủ động tạm dừng phát tin
+    hasData: true,
     scheduledSlot: "19:00", 
     rain: "2.0 mm",
     humidity: "82%",
-    wind: "16 km/h Đông", // Đã đổi sang km/h
-    imageUrl: "https://via.placeholder.com/600x320/020617/38bdf8?text=Ban+Do+Thoi+Tiet+Phan+Thiet",
+    wind: "16 km/h Đông",
     tickerText: "Mũi Né & Phan Thiết chiều tối có khả năng xuất hiện mưa dông cục bộ."
   };
 
   async function fetchPlayTxt() {
     const analysisContentEl = document.getElementById("analysisContent");
+    const mapContainerEl = document.getElementById("mapContainer");
     const statusDotEl = document.getElementById("statusDot");
     const timeTextEl = document.getElementById("timeText");
 
     if (!dataStore.hasData) {
       analysisContentEl.innerHTML = `<div class="empty-text">[Máy chủ bận / Chưa có bản tin mới]</div>`;
+      mapContainerEl.innerHTML = `<div class="empty-text">Chưa có hình ảnh bản đồ mới</div>`;
       statusDotEl.style.backgroundColor = "#ef4444";
       statusDotEl.style.boxShadow = "0 0 8px #ef4444";
       return;
     }
 
     try {
-      // Gọi dữ liệu từ GitHub kèm mã chống lưu cache cũ
       const response = await fetch(playTxtUrl + '?t=' + new Date().getTime());
       
       if (response.ok) {
         const text = await response.text();
         if (text.trim() !== "") {
-          analysisContentEl.innerText = text;
           
-          // Lấy giờ hiện tại làm mốc vừa cập nhật
+          // TỰ ĐỘNG TÌM VÀ BÓC TÁCH LINK ẢNH TRONG PLAY.TXT
+          const urlRegex = /(https?:\/\/[^\s]+(?:\.png|\.jpg|\.jpeg|\.webp|\.gif))/i;
+          const match = text.match(urlRegex);
+
+          if (match) {
+            const imageUrl = match[0];
+            // Đẩy link ảnh lên ô bản đồ
+            mapContainerEl.innerHTML = `<img src="${imageUrl}" alt="Bản đồ dự báo">`;
+            
+            // Xóa link ảnh khỏi đoạn chữ ở dưới
+            const cleanText = text.replace(imageUrl, '').trim();
+            analysisContentEl.innerText = cleanText !== "" ? cleanText : "[Bản tin hình ảnh]";
+          } else {
+            mapContainerEl.innerHTML = `<div class="empty-text">Không tìm thấy link ảnh trong Play.txt</div>`;
+            analysisContentEl.innerText = text;
+          }
+          
           const now = new Date();
           const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
           const dateString = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
@@ -244,19 +251,20 @@
           statusDotEl.style.backgroundColor = "#22c55e";
           statusDotEl.style.boxShadow = "0 0 8px #22c55e";
         } else {
-          analysisContentEl.innerHTML = `<div class="empty-text">[Máy chủ bận / File dữ liệu trống]</div>`;
+          analysisContentEl.innerHTML = `<div class="empty-text">[File Play.txt đang trống]</div>`;
+          mapContainerEl.innerHTML = `<div class="empty-text">Chưa có bản đồ</div>`;
           timeTextEl.innerText = `Trạng thái: Chưa có tin mới`;
           statusDotEl.style.backgroundColor = "#f59e0b";
           statusDotEl.style.boxShadow = "0 0 8px #f59e0b";
         }
       } else {
-        analysisContentEl.innerHTML = `<div class="empty-text">[Máy chủ bận / Không thể lấy dữ liệu]</div>`;
+        analysisContentEl.innerHTML = `<div class="empty-text">[Không thể lấy dữ liệu từ Play.txt]</div>`;
         timeTextEl.innerText = `Trạng thái: Mất kết nối`;
         statusDotEl.style.backgroundColor = "#ef4444";
         statusDotEl.style.boxShadow = "0 0 8px #ef4444";
       }
     } catch (error) {
-      analysisContentEl.innerHTML = `<div class="empty-text">[Máy chủ bận / Lỗi tải bản tin]</div>`;
+      analysisContentEl.innerHTML = `<div class="empty-text">[Lỗi tải bản tin]</div>`;
       timeTextEl.innerText = `Trạng thái: Lỗi kết nối`;
       statusDotEl.style.backgroundColor = "#ef4444";
       statusDotEl.style.boxShadow = "0 0 8px #ef4444";
@@ -268,20 +276,17 @@
     const rainValEl = document.getElementById("rainVal");
     const humidityValEl = document.getElementById("humidityVal");
     const windValEl = document.getElementById("windVal");
-    const mapContainerEl = document.getElementById("mapContainer");
 
     if (dataStore.hasData) {
       tickerBoxEl.innerText = `📢 ${dataStore.tickerText}`;
       rainValEl.innerText = dataStore.rain;
       humidityValEl.innerText = dataStore.humidity;
       windValEl.innerText = dataStore.wind;
-      mapContainerEl.innerHTML = `<img src="${dataStore.imageUrl}" alt="Bản đồ dự báo">`;
     } else {
       tickerBoxEl.innerText = `⚠️ Chưa có thông báo mới`;
       rainValEl.innerText = "--";
       humidityValEl.innerText = "--";
       windValEl.innerText = "--";
-      mapContainerEl.innerHTML = `<div class="empty-text">Chưa có hình ảnh bản đồ mới</div>`;
     }
 
     fetchPlayTxt();
