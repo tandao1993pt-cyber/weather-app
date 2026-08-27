@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -23,21 +23,20 @@
         /* HEADER */
         .header {
             margin-bottom: 12px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             border: 1px solid #334155;
             border-radius: 14px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
-        .header-top {
+        .header-container {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 6px;
         }
 
-        .header-brand-box {
+        .header-left {
             display: flex;
             flex-direction: column;
         }
@@ -46,21 +45,28 @@
             font-size: 18px;
             color: #38bdf8;
             font-weight: 800;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .header-date {
             font-size: 10px;
             color: #64748b;
-            margin-top: 3px;
+            margin-top: 4px;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
 
         .header-right {
             display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .header-right-top {
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .header-subtitle {
@@ -70,16 +76,17 @@
 
         .menu-icon {
             font-size: 18px;
-            color: #f97316;
+            color: #ffffff; /* Đổi sang màu trắng */
             font-weight: bold;
             cursor: pointer;
+            line-height: 1;
         }
 
         .header-greeting {
-            font-size: 12px;
+            font-size: 11.5px;
             color: #e2e8f0;
-            text-align: right;
             font-weight: 500;
+            margin-top: 1px; /* Sát dòng trên */
         }
 
         /* THANH BANNER AI */
@@ -89,7 +96,7 @@
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             text-decoration: none;
             color: #f8fafc;
             margin-bottom: 12px;
@@ -108,7 +115,7 @@
             color: #fff;
             font-weight: 800;
             font-size: 14px;
-            padding: 4px 10px;
+            padding: 3px 9px;
             border-radius: 8px;
             margin-right: 12px;
         }
@@ -116,13 +123,14 @@
         .ai-title {
             font-size: 14px;
             font-weight: 700;
+            color: #ffffff;
         }
 
-        /* GRID 2x2 CÂN BẰNG CHIỀU CAO */
+        /* GRID 2x2 ĐƯỢC LÀM DẸP VÀ RÕ DỄ NHÌN */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .card {
@@ -133,13 +141,13 @@
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 14px;
-            padding: 12px 8px;
+            padding: 6px 8px;
             text-decoration: none;
             color: #f8fafc;
             transition: all 0.2s ease;
             position: relative;
             cursor: pointer;
-            height: 90px; /* Cố định chiều cao cho cả 4 ô bằng nhau */
+            height: 72px; /* Hạ chiều cao dẹp lại gọn gàng */
         }
 
         .card:active {
@@ -149,53 +157,82 @@
 
         .card-title {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
+            color: #ffffff; /* Nổi bật dễ thấy hơn */
             text-align: center;
+            letter-spacing: 0.2px;
         }
 
         .card-desc {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 4px;
+            font-size: 10.5px;
+            color: #cbd5e1; /* Làm sáng màu chữ mô tả chút cho rõ */
+            margin-top: 2px;
             text-align: center;
         }
 
-        /* NHÃN GÓC (BADGE) */
+        /* NHÃN GÓC (BADGE) + HIỆU ỨNG NHẢY CHỮ */
         .badge {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 6px;
+            right: 6px;
             font-size: 9px;
             padding: 2px 6px;
             border-radius: 6px;
             font-weight: bold;
+            display: flex;
+            gap: 1px;
         }
 
         .badge-pro { background: #8b5cf6; color: #fff; }
         .badge-live { background: #ef4444; color: #fff; }
         .badge-alert { background: #3b82f6; color: #fff; }
+
+        /* KEYFRAME TẠO HIỆU ỨNG NHẢY TỪNG CHỮ KHI MỚI VÀO APP */
+        @keyframes charJump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .badge span {
+            display: inline-block;
+            animation: charJump 0.8s ease-in-out infinite;
+        }
+
+        /* Độ trễ từng chữ để nhảy nối tiếp nhau */
+        .badge span:nth-child(1) { animation-delay: 0.0s; }
+        .badge span:nth-child(2) { animation-delay: 0.15s; }
+        .badge span:nth-child(3) { animation-delay: 0.3s; }
+        .badge span:nth-child(4) { animation-delay: 0.45s; }
+        .badge span:nth-child(5) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
 
     <!-- HEADER -->
     <div class="header">
-        <div class="header-top">
-            <div class="header-brand-box">
+        <div class="header-container">
+            <!-- Bên trái: Thương hiệu & Ngày tháng -->
+            <div class="header-left">
                 <div class="header-brand">PTStormWatch 嵐</div>
                 <div id="realtime-date" class="header-date">--/--/----</div>
             </div>
+
+            <!-- Bên phải: Trang chủ, Nút 3 gạch trắng & Lời chào sát nhau -->
             <div class="header-right">
-                <span class="header-subtitle">Trang chủ `PTStormWatch 嵐`</span>
-                <span class="menu-icon">☰</span>
+                <div class="header-right-top">
+                    <span class="header-subtitle">Trang chủ `PTStormWatch 嵐`</span>
+                    <span class="menu-icon">☰</span>
+                </div>
+                <div class="header-greeting">Xin chào! Rất vui được đồng hành</div>
             </div>
         </div>
-        <div class="header-greeting">Xin chào! Rất vui được đồng hành</div>
     </div>
 
     <!-- THANH AI BANNER -->
     <a href="ai.html" onclick="location.href='ai.html'; return false;" class="card-ai-banner">
-        <span class="badge badge-pro">PRO</span>
+        <span class="badge badge-pro">
+            <span>P</span><span>R</span><span>O</span>
+        </span>
         <div class="ai-label">AI</div>
         <div class="ai-title">Quản lý hỗ trợ người dùng</div>
     </a>
@@ -205,28 +242,36 @@
         
         <!-- Ô 1: Windy -->
         <a href="rada-windy.html" onclick="location.href='rada-windy.html'; return false;" class="card">
-            <span class="badge badge-live">LIVE</span>
+            <span class="badge badge-live">
+                <span>L</span><span>I</span><span>V</span><span>E</span>
+            </span>
             <div class="card-title">Windy</div>
             <div class="card-desc">Số liệu tổng hợp</div>
         </a>
 
         <!-- Ô 2: Wind speed -->
         <a href="index.html" onclick="location.href='index.html'; return false;" class="card">
-            <span class="badge badge-live">LIVE</span>
+            <span class="badge badge-live">
+                <span>L</span><span>I</span><span>V</span><span>E</span>
+            </span>
             <div class="card-title">Wind speed</div>
             <div class="card-desc">Đo gió tổng hợp dữ liệu</div>
         </a>
 
         <!-- Ô 3: Notification -->
         <a href="https://ptstormwatch.blogspot.com" target="_blank" class="card">
-            <span class="badge badge-alert">ALERT</span>
+            <span class="badge badge-alert">
+                <span>A</span><span>L</span><span>E</span><span>R</span><span>T</span>
+            </span>
             <div class="card-title">Notification</div>
             <div class="card-desc">Tin báo bão & áp thấp</div>
         </a>
 
         <!-- Ô 4: PTStormWatch -->
         <a href="radnasaki.html" onclick="location.href='radnasaki.html'; return false;" class="card">
-            <span class="badge badge-alert">ALERT</span>
+            <span class="badge badge-alert">
+                <span>A</span><span>L</span><span>E</span><span>R</span><span>T</span>
+            </span>
             <div class="card-title">PTStormWatch</div>
             <div class="card-desc">Cảnh báo thủ công</div>
         </a>
