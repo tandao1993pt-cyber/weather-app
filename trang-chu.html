@@ -26,7 +26,7 @@
             padding: 12px 14px;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             border: 1px solid #334155;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
@@ -76,7 +76,7 @@
 
         .menu-icon {
             font-size: 18px;
-            color: #ffffff; /* Đổi sang màu trắng */
+            color: #ffffff; /* Nút 3 gạch màu trắng */
             font-weight: bold;
             cursor: pointer;
             line-height: 1;
@@ -86,21 +86,23 @@
             font-size: 11.5px;
             color: #e2e8f0;
             font-weight: 500;
-            margin-top: 1px; /* Sát dòng trên */
+            margin-top: 1px;
         }
 
         /* THANH BANNER AI */
         .card-ai-banner {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             background: #1e293b;
             border: 1px solid #334155;
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 12px 14px;
             text-decoration: none;
             color: #f8fafc;
             margin-bottom: 12px;
             position: relative;
+            height: 48px;
             transition: all 0.2s ease;
         }
 
@@ -114,19 +116,25 @@
             border: 1px solid #3b82f6;
             color: #fff;
             font-weight: 800;
-            font-size: 14px;
-            padding: 3px 9px;
+            font-size: 13px;
+            padding: 3px 8px;
             border-radius: 8px;
-            margin-right: 12px;
+            z-index: 2;
         }
 
+        /* Chữ nằm chính giữa thanh AI */
         .ai-title {
-            font-size: 14px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13.5px;
             font-weight: 700;
             color: #ffffff;
+            white-space: nowrap;
+            z-index: 1;
         }
 
-        /* GRID 2x2 ĐƯỢC LÀM DẸP VÀ RÕ DỄ NHÌN */
+        /* GRID 2x2 CĂN ĐỀU VIỀN VÀ BO GÓC */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -140,14 +148,14 @@
             justify-content: center;
             background: #1e293b;
             border: 1px solid #334155;
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 6px 8px;
             text-decoration: none;
             color: #f8fafc;
             transition: all 0.2s ease;
             position: relative;
             cursor: pointer;
-            height: 72px; /* Hạ chiều cao dẹp lại gọn gàng */
+            height: 70px; /* Độ cao dẹp gọn gàng */
         }
 
         .card:active {
@@ -158,19 +166,18 @@
         .card-title {
             font-size: 15px;
             font-weight: 800;
-            color: #ffffff; /* Nổi bật dễ thấy hơn */
+            color: #ffffff;
             text-align: center;
-            letter-spacing: 0.2px;
         }
 
         .card-desc {
             font-size: 10.5px;
-            color: #cbd5e1; /* Làm sáng màu chữ mô tả chút cho rõ */
+            color: #cbd5e1;
             margin-top: 2px;
             text-align: center;
         }
 
-        /* NHÃN GÓC (BADGE) + HIỆU ỨNG NHẢY CHỮ */
+        /* NHÃN (BADGE) + HIỆU ỨNG TRƯỢT SÁNG 2 GIÂY */
         .badge {
             position: absolute;
             top: 6px;
@@ -179,31 +186,27 @@
             padding: 2px 6px;
             border-radius: 6px;
             font-weight: bold;
-            display: flex;
-            gap: 1px;
+            letter-spacing: 0.5px;
+            /* Chạy hiệu ứng mượt trong 2 giây rồi dừng hẳn */
+            animation: badgeSlideGlow 2s ease-out forwards;
         }
 
-        .badge-pro { background: #8b5cf6; color: #fff; }
+        .badge-pro { background: #8b5cf6; color: #fff; position: relative; top: auto; right: auto; }
         .badge-live { background: #ef4444; color: #fff; }
         .badge-alert { background: #3b82f6; color: #fff; }
 
-        /* KEYFRAME TẠO HIỆU ỨNG NHẢY TỪNG CHỮ KHI MỚI VÀO APP */
-        @keyframes charJump {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+        @keyframes badgeSlideGlow {
+            0% {
+                transform: translateX(10px);
+                opacity: 0;
+                filter: brightness(0.5);
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+                filter: brightness(1);
+            }
         }
-
-        .badge span {
-            display: inline-block;
-            animation: charJump 0.8s ease-in-out infinite;
-        }
-
-        /* Độ trễ từng chữ để nhảy nối tiếp nhau */
-        .badge span:nth-child(1) { animation-delay: 0.0s; }
-        .badge span:nth-child(2) { animation-delay: 0.15s; }
-        .badge span:nth-child(3) { animation-delay: 0.3s; }
-        .badge span:nth-child(4) { animation-delay: 0.45s; }
-        .badge span:nth-child(5) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
@@ -211,13 +214,11 @@
     <!-- HEADER -->
     <div class="header">
         <div class="header-container">
-            <!-- Bên trái: Thương hiệu & Ngày tháng -->
             <div class="header-left">
                 <div class="header-brand">PTStormWatch 嵐</div>
                 <div id="realtime-date" class="header-date">--/--/----</div>
             </div>
 
-            <!-- Bên phải: Trang chủ, Nút 3 gạch trắng & Lời chào sát nhau -->
             <div class="header-right">
                 <div class="header-right-top">
                     <span class="header-subtitle">Trang chủ `PTStormWatch 嵐`</span>
@@ -230,48 +231,38 @@
 
     <!-- THANH AI BANNER -->
     <a href="ai.html" onclick="location.href='ai.html'; return false;" class="card-ai-banner">
-        <span class="badge badge-pro">
-            <span>P</span><span>R</span><span>O</span>
-        </span>
         <div class="ai-label">AI</div>
         <div class="ai-title">Quản lý hỗ trợ người dùng</div>
+        <span class="badge badge-pro">PRO</span>
     </a>
 
-    <!-- KHUNG 4 Ô CẢNH BÁO/ĐO GIÓ -->
+    <!-- KHUNG 4 Ô CHỨC NĂNG -->
     <div class="grid-container">
         
         <!-- Ô 1: Windy -->
         <a href="rada-windy.html" onclick="location.href='rada-windy.html'; return false;" class="card">
-            <span class="badge badge-live">
-                <span>L</span><span>I</span><span>V</span><span>E</span>
-            </span>
+            <span class="badge badge-live">LIVE</span>
             <div class="card-title">Windy</div>
             <div class="card-desc">Số liệu tổng hợp</div>
         </a>
 
         <!-- Ô 2: Wind speed -->
         <a href="index.html" onclick="location.href='index.html'; return false;" class="card">
-            <span class="badge badge-live">
-                <span>L</span><span>I</span><span>V</span><span>E</span>
-            </span>
+            <span class="badge badge-live">LIVE</span>
             <div class="card-title">Wind speed</div>
             <div class="card-desc">Đo gió tổng hợp dữ liệu</div>
         </a>
 
         <!-- Ô 3: Notification -->
         <a href="https://ptstormwatch.blogspot.com" target="_blank" class="card">
-            <span class="badge badge-alert">
-                <span>A</span><span>L</span><span>E</span><span>R</span><span>T</span>
-            </span>
+            <span class="badge badge-alert">ALERT</span>
             <div class="card-title">Notification</div>
             <div class="card-desc">Tin báo bão & áp thấp</div>
         </a>
 
         <!-- Ô 4: PTStormWatch -->
         <a href="radnasaki.html" onclick="location.href='radnasaki.html'; return false;" class="card">
-            <span class="badge badge-alert">
-                <span>A</span><span>L</span><span>E</span><span>R</span><span>T</span>
-            </span>
+            <span class="badge badge-alert">ALERT</span>
             <div class="card-title">PTStormWatch</div>
             <div class="card-desc">Cảnh báo thủ công</div>
         </a>
@@ -279,7 +270,7 @@
     </div>
 
     <script>
-        // Tự động cập nhật ngày tháng năm thực tế
+        // Cập nhật ngày tháng năm thực tế
         function updateDate() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
