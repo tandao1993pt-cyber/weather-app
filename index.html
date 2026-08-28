@@ -6,33 +6,76 @@
   <title>PTStormWatch 嵐</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #000000; color: #f8fafc; padding: 8px; display: flex; justify-content: center; min-height: 100vh; }
+    body { background-color: #000000; color: #ffffff; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
     .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 10px; }
     
-    /* Header */
-    .header { display: flex; justify-content: space-between; align-items: center; border: 2px solid #ff3333; padding: 8px 10px; border-radius: 4px; background: rgba(255, 51, 51, 0.05); }
-    .header .title { font-size: 20px; font-weight: bold; color: #ffffff; }
-    .header .menu-icon { font-size: 22px; cursor: pointer; color: #ff3333; }
-
-    /* Thanh Thời Gian */
-    .time-bar-box { 
-      border: 2px solid #ff3333; 
-      border-radius: 4px; 
-      padding: 8px 10px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 6px; 
+    /* Khung viền đỏ chuẩn wireframe */
+    .wire-box {
+      border: 2px solid #ff3333;
       background: #000000;
+      padding: 8px;
     }
-    .time-row-top { display: flex; justify-content: space-between; align-items: center; color: #ff3333; font-size: 13px; font-weight: 600; }
-    .live-clock-digits { font-family: monospace; font-size: 15px; color: #ffffff; font-weight: 700; background: rgba(255, 51, 51, 0.2); padding: 2px 8px; border-radius: 4px; border: 1px solid #ff3333; }
-    .time-row-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255, 51, 51, 0.3); padding-top: 6px; }
-    .status-badge { background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px; border: 1px solid #4ade80; }
 
-    /* Layout chính chia 2 cột theo khung vẽ */
-    .main-dashboard-grid {
+    /* Header chuẩn hình vẽ */
+    .header-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-box {
+      border: 2px solid #ff3333;
+      padding: 4px 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #000;
+    }
+    .refresh-info {
+      font-size: 10px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .status-badge {
+      background: #047857;
+      color: #ffffff;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: bold;
+      border: 1px solid #10b981;
+    }
+    .header-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .date-box {
+      border: 2px solid #ff3333;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+      min-width: 140px;
+    }
+    .clock-box {
+      border: 2px solid #ff3333;
+      padding: 4px 12px;
+      font-size: 15px;
+      font-weight: bold;
+      font-family: monospace;
+      color: #ffffff;
+    }
+
+    /* Layout 2 cột */
+    .main-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
@@ -48,207 +91,296 @@
       gap: 10px;
     }
 
-    /* Khung viền đỏ chuẩn wireframe */
-    .wire-box {
-      border: 2px solid #ff3333;
-      border-radius: 4px;
-      padding: 10px;
-      background: #000000;
-    }
-
-    .section-header-box {
+    /* Cột trái */
+    .section-title-box {
       border: 2px solid #ff3333;
       text-align: center;
       padding: 6px;
       font-size: 12px;
       font-weight: bold;
       color: #ffffff;
-      margin-bottom: 10px;
-      background: rgba(255, 51, 51, 0.1);
+      margin-bottom: 8px;
     }
 
-    /* Lưới 9 ô thông số */
-    .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .grid-item { border: 1px solid #ff3333; border-radius: 3px; padding: 6px 2px; text-align: center; background: #000; }
-    .grid-label { font-size: 10px; color: #94a3b8; margin-bottom: 2px; font-weight: 500; }
-    .grid-value { font-size: 12px; font-weight: 700; color: #ffffff; }
+    /* 9 ô chữ nhật đứng */
+    .grid-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .grid-item-tall {
+      border: 2px solid #ff3333;
+      height: 110px;
+      padding: 6px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #000;
+    }
+    .grid-label { font-size: 10px; color: #ffffff; font-weight: bold; }
+    .grid-value { font-size: 12px; font-weight: bold; color: #ffffff; word-break: break-word; }
     .highlight-rain { color: #38bdf8; }
 
-    /* Cột phải: Gió & La bàn */
-    .wind-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .wind-speed-val { font-size: 22px; font-weight: 800; color: #ffffff; }
-    .wind-gust { font-size: 11px; color: #94a3b8; margin-bottom: 2px; }
-    
-    .compass-box { width: 75px; height: 75px; position: relative; margin: 0 auto; }
+    /* Nút giải thích phía dưới bên trái */
+    .explain-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      margin-top: auto;
+    }
+    .red-dash {
+      width: 12px;
+      height: 4px;
+      background: #ff3333;
+      transform: rotate(-45deg);
+      display: inline-block;
+    }
+    .explain-text { font-size: 11px; font-weight: bold; color: #ffffff; }
 
-    .zz-box {
-      border: 1px solid #ff3333;
-      text-align: center;
-      font-family: monospace;
-      font-size: 12px;
-      color: #ff3333;
-      padding: 2px;
-      margin-top: 6px;
+    /* Cột phải - Ô Gió & La bàn */
+    .wind-speed-box {
+      border: 2px solid #ff3333;
+      padding: 4px 6px;
+      font-size: 13px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .gust-info-text {
+      font-size: 10px;
+      text-align: right;
+      color: #ffffff;
     }
 
-    /* 4 dòng dự báo bên phải */
-    .forecast-stack {
+    .compass-container {
+      width: 80px;
+      height: 80px;
+      margin: 4px auto;
+      position: relative;
+    }
+
+    .bottom-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: monospace;
+      margin-top: 4px;
+    }
+
+    /* 4 ô dự báo có gạch xanh góc phải */
+    .forecast-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-    .forecast-row-item {
-      border: 1px solid #ff3333;
+    .forecast-card {
+      border: 2px solid #ff3333;
       padding: 6px 8px;
+      position: relative;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .green-corner-tag {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      width: 12px;
+      height: 4px;
+      background: #4ade80;
+      transform: rotate(-30deg);
+    }
+    .fc-time { font-size: 12px; font-weight: bold; color: #ffffff; }
+    .fc-details { font-size: 10px; color: #ffffff; white-space: nowrap; }
+
+    /* Thảm quy địa bàn Phan Thiết */
+    .station-title {
       font-size: 11px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .station-sub-box {
+      border: 2px solid #ff3333;
+      height: 26px;
+      margin-top: 6px;
+      padding: 2px 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #000;
-      position: relative;
-    }
-    .forecast-row-item::after {
-      content: '';
-      position: absolute;
-      right: 4px;
-      top: 4px;
-      width: 6px;
-      height: 6px;
-      background: #4ade80;
-      transform: rotate(45deg);
+      font-size: 10px;
     }
 
-    /* Thảm quy địa bàn Phan Thiết */
-    .station-list { display: flex; flex-direction: column; gap: 6px; }
-    .station-item-box {
-      border: 1px solid #ff3333;
-      height: 32px;
-      background: #000;
-    }
-
-    /* Ẩn các phần tử cũ không khớp layout gốc nhưng giữ lại ID để JS không lỗi */
     .hidden-legacy { display: none; }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="title">PTStormWatch 嵐</div>
-      <div class="menu-icon">☰</div>
-    </div>
-
-    <!-- Live Time Bar -->
-    <div class="time-bar-box">
-      <div class="time-row-top">
-        <span id="liveDate">Đang tải ngày...</span>
-        <div class="live-clock-digits" id="liveClock">00:00:00</div>
+    
+    <!-- HEADER CHUẨN BẢN VẼ -->
+    <div class="wire-box header-box">
+      <div class="header-top">
+        <div class="title-box">PTStormWatch嵐</div>
+        <div class="refresh-info">
+          <span>Tự động làm mới dữ liệu:5 phút lần</span>
+          <span class="status-badge" id="statusBadge">MỚI NHẤT</span>
+        </div>
       </div>
-      <div class="time-row-bottom">
-        <span>Tự động làm mới dữ liệu: 5 phút lần</span>
-        <span class="status-badge" id="statusBadge">● ĐANG TẢI...</span>
+      <div class="header-bottom">
+        <div class="date-box" id="liveDate">28/8/2026</div>
+        <div class="clock-box" id="liveClock">18:14:49</div>
       </div>
     </div>
 
-    <!-- Main Dashboard Grid (Chia 2 cột theo đúng hình mẫu) -->
-    <div class="main-dashboard-grid">
+    <!-- MAIN GRID 2 CỘT -->
+    <div class="main-grid">
       
       <!-- CỘT BÊN TRÁI -->
       <div class="col-left">
-        <div class="wire-box" style="padding: 8px;">
-          <div class="section-header-box" style="margin-bottom: 8px;">Số liệu thời gian thực</div>
+        <div class="wire-box">
+          <div class="section-title-box">Số liệu thời gian thật</div>
           
-          <!-- Lưới 9 ô -->
-          <div class="grid-container">
-            <div class="grid-item"><div class="grid-label">Nhiệt độ</div><div class="grid-value" id="temp">--</div></div>
-            <div class="grid-item"><div class="grid-label">Cảm nhận</div><div class="grid-value" id="apparentTemp">--</div></div>
-            <div class="grid-item"><div class="grid-label">Độ ẩm</div><div class="grid-value" id="humidity">--</div></div>
-            <div class="grid-item"><div class="grid-label">Áp suất</div><div class="grid-value" id="pressure">--</div></div>
-            <div class="grid-item"><div class="grid-label">Khả năng mưa</div><div class="grid-value highlight-rain" id="pop">--</div></div>
-            <div class="grid-item"><div class="grid-label">Mây phủ</div><div class="grid-value" id="cloudCover">--</div></div>
-            <div class="grid-item"><div class="grid-label">Chỉ số UV</div><div class="grid-value" id="uvIndex">--</div></div>
-            <div class="grid-item"><div class="grid-label">Tầm nhìn</div><div class="grid-value" id="visibility">--</div></div>
-            <div class="grid-item"><div class="grid-label">Điểm sương</div><div class="grid-value" id="dewPoint">--</div></div>
+          <div class="grid-3x3">
+            <div class="grid-item-tall">
+              <div class="grid-label">Nhiệt độ</div>
+              <div class="grid-value" id="temp">-- °C</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Cảm nhận</div>
+              <div class="grid-value" id="apparentTemp">-- °C</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Độ ẩm</div>
+              <div class="grid-value" id="humidity">-- %</div>
+            </div>
+            
+            <div class="grid-item-tall">
+              <div class="grid-label">Áp suất</div>
+              <div class="grid-value" id="pressure">-- hPa</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Khả năng mưa</div>
+              <div class="grid-value highlight-rain" id="pop">-- %</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Mây phủ</div>
+              <div class="grid-value" id="cloudCover">-- %</div>
+            </div>
+
+            <div class="grid-item-tall">
+              <div class="grid-label">Chỉ số UV</div>
+              <div class="grid-value" id="uvIndex">--</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Tầm nhìn</div>
+              <div class="grid-value" id="visibility">-- km</div>
+            </div>
+            <div class="grid-item-tall">
+              <div class="grid-label">Điểm sương</div>
+              <div class="grid-value" id="dewPoint">-- °C</div>
+            </div>
           </div>
         </div>
 
-        <!-- Mục dưới bên trái -->
-        <div class="wire-box" style="margin-top: auto; padding: 8px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 11px; color: #ff3333; font-weight: bold;">Giải thích những thông số</span>
-          <span style="color: #ff3333; font-size: 14px;">↗</span>
+        <!-- Ô GIẢI THÍCH NHỮNG THÔNG SỐ GÓC DƯỚI -->
+        <div class="wire-box explain-box">
+          <span class="red-dash"></span>
+          <span class="explain-text">Giải thích những thông số</span>
         </div>
       </div>
 
       <!-- CỘT BÊN PHẢI -->
       <div class="col-right">
-        <!-- Khung Gió & La Bàn -->
-        <div class="wire-box" style="padding: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-            <div>
-              <div class="wind-gust" style="font-size: 10px;">Gió giật <span id="windGust">--</span></div>
-              <div class="wind-speed-val" id="windSpeed">--</div>
-            </div>
-            <div class="compass-box">
-              <svg viewBox="0 0 100 100" width="75" height="75">
-                <circle cx="50" cy="50" r="45" fill="rgba(0,0,0,1)" stroke="#ff3333" stroke-width="2"/>
-                <!-- Chữ định hướng theo hình vẽ: B, N, Đ, T -->
-                <text x="50" y="18" font-size="11" font-weight="bold" fill="#ff3333" text-anchor="middle">B</text>
-                <text x="50" y="88" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">N</text>
-                <text x="88" y="53" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">Đ</text>
-                <text x="12" y="53" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">T</text>
-                <g id="compassNeedle" transform="rotate(0 50 50)" style="transition: transform 0.3s ease-out;">
-                  <polygon points="50,18 44,50 50,46" fill="#ef4444"/>
-                  <polygon points="50,18 56,50 50,46" fill="#dc2626"/>
-                  <polygon points="50,82 44,50 50,54" fill="#64748b"/>
-                  <polygon points="50,82 56,50 50,54" fill="#475569"/>
-                  <circle cx="50" cy="50" r="4" fill="#ffffff"/>
-                </g>
-              </svg>
+        
+        <!-- KHUNG GIÓ VÀ LA BÀN -->
+        <div class="wire-box">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div class="wind-speed-box" id="windSpeed">19.0 km/h</div>
+            <div class="gust-info-text">
+              <div id="windGust">Gió giật 39.6 km/h</div>
+              <div id="windDirectionText">WSW (255°)</div>
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8;">
-            <span id="windDirectionText">--</span>
-            <span id="beaufortText">--</span>
+
+          <div class="compass-container">
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <circle cx="50" cy="50" r="44" fill="#000" stroke="#ff3333" stroke-width="2"/>
+              <text x="50" y="16" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">B</text>
+              <text x="50" y="90" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">N</text>
+              <text x="88" y="54" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Đ</text>
+              <text x="12" y="54" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">T</text>
+              <line x1="24" y1="50" x2="76" y2="50" stroke="#ff3333" stroke-width="3" id="compassLine"/>
+              <circle cx="50" cy="50" r="3" fill="#ffffff"/>
+            </svg>
           </div>
-          <div class="zz-box">zz &nbsp;&nbsp;&nbsp;&nbsp; #####</div>
-        </div>
 
-        <!-- 4 dòng thông số dự báo ngắn hạn giống hình -->
-        <div class="forecast-stack" id="forecastScroll">
-          <div class="forecast-row-item">18:00 &nbsp; 262° W &nbsp; 15.5 km/h &nbsp; 67%</div>
-          <div class="forecast-row-item">18:00 &nbsp; 262° W &nbsp; 15.5 km/h &nbsp; 67%</div>
-          <div class="forecast-row-item">18:00 &nbsp; 262° W &nbsp; 15.5 km/h &nbsp; 67%</div>
-          <div class="forecast-row-item">18:00 &nbsp; 262° W &nbsp; 15.5 km/h &nbsp; 67%</div>
-        </div>
-
-        <!-- Thảm quy địa bàn Phan Thiết -->
-        <div class="wire-box" style="padding: 8px;">
-          <div style="font-size: 11px; font-weight: bold; color: #ff3333; margin-bottom: 6px;">Thảm quy địa bàn Phan Thiết</div>
-          <div class="station-list">
-            <div class="station-item-box"></div>
-            <div class="station-item-box"></div>
-            <div class="station-item-box"></div>
+          <div class="bottom-status-row">
+            <span id="beaufortShort">zz</span>
+            <span id="beaufortText">######</span>
           </div>
         </div>
+
+        <!-- 4 Ô DỰ BÁO NGẮN HẠN -->
+        <div class="forecast-list" id="forecastScroll">
+          <div class="forecast-card">
+            <div class="green-corner-tag"></div>
+            <div class="fc-time">18:00</div>
+            <div class="fc-details">262° W 15.5 km/h 67%</div>
+          </div>
+          <div class="forecast-card">
+            <div class="green-corner-tag"></div>
+            <div class="fc-time">18:00</div>
+            <div class="fc-details">262° W 15.5 km/h 67%</div>
+          </div>
+          <div class="forecast-card">
+            <div class="green-corner-tag"></div>
+            <div class="fc-time">18:00</div>
+            <div class="fc-details">262° W 15.5 km/h 67%</div>
+          </div>
+          <div class="forecast-card">
+            <div class="green-corner-tag"></div>
+            <div class="fc-time">18:00</div>
+            <div class="fc-details">262° W 15.5 km/h 67%</div>
+          </div>
+        </div>
+
+        <!-- THẢM QUY ĐỊA BÀN PHAN THIẾT -->
+        <div class="wire-box">
+          <div class="station-title">Thảm quy địa bàn Phan Thiết</div>
+          <div class="station-sub-box">
+            <span id="stPhuThuyName">Trạm Phú Thủy</span>
+            <span id="stPhuThuySpeed">-- km/h</span>
+          </div>
+          <div class="station-sub-box">
+            <span id="stMuiNeName">Trạm Mũi Né</span>
+            <span id="stMuiNeSpeed">-- km/h</span>
+          </div>
+          <div class="station-sub-box">
+            <span>Trạm dự phòng</span>
+            <span>--</span>
+          </div>
+        </div>
+
       </div>
 
     </div>
 
-    <!-- Các thẻ legacy ẩn chứa dữ liệu ID phục vụ JavaScript không bị lỗi -->
+    <!-- Ẩn ID phục vụ JS cũ -->
     <div class="hidden-legacy">
-      <span id="stPhuThuySpeed"></span>
       <span id="stPhuThuyStatus"></span>
-      <span id="stMuiNeSpeed"></span>
       <span id="stMuiNeStatus"></span>
     </div>
+
   </div>
 
   <script>
     function updateLiveTime() {
       const now = new Date();
       const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-      document.getElementById('liveDate').innerText = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      document.getElementById('liveDate').innerText = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
       document.getElementById('liveClock').innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
     }
     setInterval(updateLiveTime, 1000);
@@ -265,7 +397,7 @@
       if (speedKmH <= 5) return { level: 1, desc: "1/12 Gió nhẹ" };
       if (speedKmH <= 11) return { level: 2, desc: "2/12 Gió nhẹ" };
       if (speedKmH <= 19) return { level: 3, desc: "3/12 Gió yếu" };
-      if (speedKmH <= 28) return { level: 4, desc: "4/12 Gió vừa phải" };
+      if (speedKmH <= 28) return { level: 4, desc: "4/12 Gió vừa" };
       if (speedKmH <= 38) return { level: 5, desc: "5/12 Gió khá mạnh" };
       if (speedKmH <= 49) return { level: 6, desc: "6/12 Gió mạnh" };
       if (speedKmH <= 61) return { level: 7, desc: "7/12 Gió rất mạnh" };
@@ -276,8 +408,7 @@
 
     async function fetchWeatherData() {
       const statusBadge = document.getElementById('statusBadge');
-      statusBadge.innerText = "● ĐANG CẬP NHẬT...";
-      statusBadge.style.color = "#f59e0b";
+      statusBadge.innerText = "ĐANG CẬP NHẬT";
 
       const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=10.9333&longitude=108.1000&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,dew_point_2m&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,precipitation&timezone=Asia%2FBangkok";
 
@@ -296,36 +427,34 @@
           if (startIndex === -1) startIndex = 0;
         }
 
-        document.getElementById('windSpeed').innerText = current.wind_speed_10m.toFixed(1) + " km/h";
-        document.getElementById('windGust').innerText = current.wind_gusts_10m.toFixed(1) + " km/h";
+        document.getElementById('windSpeed').innerText = `${current.wind_speed_10m.toFixed(1)} km/h`;
+        document.getElementById('windGust').innerText = `Gió giật ${current.wind_gusts_10m.toFixed(1)} km/h`;
         document.getElementById('temp').innerText = `${current.temperature_2m.toFixed(1)} °C`;
         document.getElementById('apparentTemp').innerText = `${current.apparent_temperature.toFixed(1)} °C`;
-        document.getElementById('humidity').innerText = `${current.relative_humidity_2m} %`;
+        document.getElementById('humidity').innerText = `${current.relative_humidity_2m}%`;
         document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
         
         const currentRainProb = data.hourly.precipitation_probability[startIndex] ?? 0;
         const currentRainMm = data.hourly.precipitation[startIndex] ?? 0;
-        
-        document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb} %`;
+        document.getElementById('pop').innerText = currentRainMm > 0 ? `${currentRainProb}% (${currentRainMm}mm)` : `${currentRainProb}%`;
 
-        document.getElementById('cloudCover').innerText = `${current.cloud_cover} %`;
+        document.getElementById('cloudCover').innerText = `${current.cloud_cover}%`;
         document.getElementById('uvIndex').innerText = current.uv_index.toFixed(1);
         document.getElementById('visibility').innerText = `${(current.visibility / 1000).toFixed(1)} km`;
         document.getElementById('dewPoint').innerText = `${current.dew_point_2m.toFixed(1)} °C`;
 
         const windDir = current.wind_direction_10m;
-        document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDir} 50 50)`);
+        const line = document.getElementById('compassLine');
+        if (line) line.setAttribute('transform', `rotate(${windDir} 50 50)`);
         document.getElementById('windDirectionText').innerText = `${getWindDirName(windDir)} (${windDir}°)`;
 
         const beaufort = getBeaufort(current.wind_speed_10m);
+        document.getElementById('beaufortShort').innerText = `Cấp ${beaufort.level}`;
         document.getElementById('beaufortText').innerText = beaufort.desc;
 
         document.getElementById('stPhuThuySpeed').innerText = `${current.wind_speed_10m.toFixed(1)} km/h`;
-        document.getElementById('stPhuThuyStatus').innerText = beaufort.desc;
-
         const muiNeSpeed = current.wind_speed_10m * 1.12;
         document.getElementById('stMuiNeSpeed').innerText = `${muiNeSpeed.toFixed(1)} km/h`;
-        document.getElementById('stMuiNeStatus').innerText = getBeaufort(muiNeSpeed).desc;
 
         const forecastContainer = document.getElementById('forecastScroll');
         forecastContainer.innerHTML = '';
@@ -341,18 +470,18 @@
           const fcRain = data.hourly.precipitation_probability[targetIndex] ?? 0;
 
           forecastContainer.innerHTML += `
-            <div class="forecast-row-item">
-              <span>${timeLabel} &nbsp; ${fcDir}° ${getWindDirName(fcDir)} &nbsp; ${fcWind} km/h &nbsp; ${fcRain}%</span>
+            <div class="forecast-card">
+              <div class="green-corner-tag"></div>
+              <div class="fc-time">${timeLabel}</div>
+              <div class="fc-details">${fcDir}° ${getWindDirName(fcDir)} ${fcWind} km/h ${fcRain}%</div>
             </div>
           `;
         }
 
-        statusBadge.innerText = "● MỚI NHẤT";
-        statusBadge.style.color = "#4ade80";
+        statusBadge.innerText = "MỚI NHẤT";
       } catch (err) {
         console.error("Lỗi lấy dữ liệu:", err);
-        statusBadge.innerText = "● LỖI MẠNG";
-        statusBadge.style.color = "#ef4444";
+        statusBadge.innerText = "LỖI MẠNG";
       }
     }
 
@@ -360,4 +489,5 @@
     setInterval(fetchWeatherData, 300000);
   </script>
 </body>
-</html>
+  </html>
+  
