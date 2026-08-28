@@ -112,10 +112,6 @@
     .modal-close { cursor: pointer; font-size: 18px; color: #94a3b8; }
     .modal-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #cbd5e1; }
     .modal-item-title { font-weight: 700; color: #fff; }
-
-    /* Iframe Card */
-    .iframe-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 10px; height: 500px; }
-    iframe { width: 100%; height: 100%; border: none; border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -254,10 +250,6 @@
 
       </div>
     </div>
-
-    <div class="iframe-card">
-      <iframe src="https://www.tropicaltidbits.com/analysis/models/"></iframe>
-    </div>
   </div>
 
   <div class="modal-overlay" id="guideModal">
@@ -326,7 +318,6 @@
 
       box.innerHTML = `<span class="anim-rain">${iconStr}</span>`;
 
-      // Đóng băng hiệu ứng sau 15 giây
       setTimeout(() => {
         const animElem = box.querySelector('.anim-rain');
         if (animElem) animElem.classList.remove('anim-rain');
@@ -400,4 +391,10 @@
         });
 
         // Gió & La bàn
-        document.getElementById('wi
+        document.getElementById('windSpeed').innerText = cur.wind_speed_10m.toFixed(1);
+        document.getElementById('windGust').innerText = cur.wind_gusts_10m.toFixed(1);
+        const windDeg = cur.wind_direction_10m;
+        document.getElementById('windDirText').innerText = `${getWindDirName(windDeg)} (${windDeg}°)`;
+        document.getElementById('compassNeedle').setAttribute('transform', `rotate(${windDeg} 50 50)`);
+
+        // Dự báo ngắn hạn (4 mốc giờ tiếp the
